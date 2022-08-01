@@ -22,6 +22,10 @@ import {
   DeployCommitmentMapperArgs,
   DeployedCommitmentMapper,
 } from 'tasks/deploy-tasks/unit/periphery/deploy-commitment-mapper-registry.task';
+import {
+  DeployedGithubAttester,
+  DeployGithubAttesterArgs,
+} from 'tasks/deploy-tasks/unit/attesters/github/deploy-github-attester.task';
 
 async function deploymentAction(
   { options }: { options: DeployOptions },
@@ -74,6 +78,15 @@ async function deploymentAction(
     options,
   } as DeployHydraS1SoulboundAttesterArgs)) as DeployedHydraS1SoulboundAttester;
 
+  const { githubAttester } = (await hre.run('deploy-github-attester', {
+    owner: config.githubAttester.owner,
+    collectionIdFirst: config.githubAttester.collectionIdFirst,
+    collectionIdLast: config.githubAttester.collectionIdLast,
+    attesterOracleAddress: commitmentMapperRegistry.address,
+    attestationsRegistryAddress: attestationsRegistry.address,
+    options,
+  } as DeployGithubAttesterArgs)) as DeployedGithubAttester;
+
   await hre.run('register-for-attester', {
     availableRootsRegistryAddress: availableRootsRegistry.address,
     attester: hydraS1SimpleAttester.address,
@@ -84,6 +97,11 @@ async function deploymentAction(
     attester: hydraS1SoulboundAttester.address,
     root: config.hydraS1SoulboundAttester.initialRoot,
   });
+  // await hre.run('register-for-attester', {
+  //   availableRootsRegistryAddress: availableRootsRegistry.address,
+  //   attester: githubAttester.address,
+  //   root: config.hydraS1SoulboundAttester.initialRoot,
+  // });
   options?.log && console.log('Contracts deployed on local');
 
   await (
@@ -99,6 +117,14 @@ async function deploymentAction(
       hydraS1SimpleAttester.address,
       config.hydraS1SimpleAttester.collectionIdFirst,
       config.hydraS1SimpleAttester.collectionIdLast
+    )
+  ).wait();
+
+  await (
+    await attestationsRegistry.authorizeRange(
+      githubAttester.address,
+      config.githubAttester.collectionIdFirst,
+      config.githubAttester.collectionIdLast
     )
   ).wait();
 }

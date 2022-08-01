@@ -27,6 +27,11 @@ export type DeploymentsConfigTypes = {
       collectionIdLast: string;
       initialRoot: string;
     };
+    githubAttester: {
+      owner: string;
+      collectionIdFirst: string;
+      collectionIdLast: string;
+    };
     // Conf related to the commitment mapper
     // https://github.com/sismo-core/sismo-commitment-mapper
     commitmentMapper: {

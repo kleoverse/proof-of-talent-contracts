@@ -29,10 +29,15 @@ import {
   Badges,
   CommitmentMapperRegistry,
   Front,
+  GithubAttester,
   HydraS1SimpleAttester,
   HydraS1SoulboundAttester,
   HydraS1Verifier,
 } from 'types';
+import {
+  DeployedGithubAttester,
+  DeployGithubAttesterArgs,
+} from '../unit/attesters/github/deploy-github-attester.task';
 
 export interface Deployed0 {
   attestationsRegistry: AttestationsRegistry;
@@ -43,6 +48,7 @@ export interface Deployed0 {
   hydraS1SimpleAttester: HydraS1SimpleAttester;
   hydraS1SoulboundAttester: HydraS1SoulboundAttester;
   hydraS1Verifier: HydraS1Verifier;
+  githubAttester: GithubAttester;
 }
 
 async function deploymentAction(
@@ -52,6 +58,7 @@ async function deploymentAction(
   const deployer = await getDeployer(hre);
   const config = deploymentsConfig[hre.network.name];
   options = { ...config.deployOptions, ...options };
+  options.log = true;
   if (options.manualConfirm || options.log) {
     console.log('0-deploy-core-and-hydra-s1-simple-and-soulbound: ', hre.network.name);
   }
@@ -89,6 +96,20 @@ async function deploymentAction(
     'deploy-hydra-s1-simple-attester',
     hydraS1SimpleArgs
   )) as DeployedHydraS1SimpleAttester;
+
+  const githubAttesterArgs: DeployGithubAttesterArgs = {
+    owner: deployer.address,
+    collectionIdFirst: config.githubAttester.collectionIdFirst,
+    collectionIdLast: config.githubAttester.collectionIdLast,
+    attesterOracleAddress: '0x98941094d282ddA631031283EA70ec9e81246638',
+    attestationsRegistryAddress: attestationsRegistry.address,
+    options,
+  };
+
+  const { githubAttester } = (await hre.run(
+    'deploy-github-attester',
+    githubAttesterArgs
+  )) as DeployedGithubAttester;
 
   const soulBoundArgs: DeployHydraS1SoulboundAttesterArgs = {
     collectionIdFirst: config.hydraS1SoulboundAttester.collectionIdFirst,
@@ -153,6 +174,19 @@ async function deploymentAction(
     attesterAddress: hydraS1SoulboundAttester.address,
     collectionIdFirst: config.hydraS1SoulboundAttester.collectionIdFirst,
     collectionIdLast: config.hydraS1SoulboundAttester.collectionIdLast,
+    options: getCommonOptions(options),
+  } as AuthorizeRangeArgs);
+
+  if (options.manualConfirm || options.log) {
+    console.log(`
+    ----------------------------------------------------------------
+    * Authorize GithubAttester to record on the AttestationsRegistry`);
+  }
+  await hre.run('attestations-registry-authorize-range', {
+    attestationsRegistryAddress: attestationsRegistry.address,
+    attesterAddress: githubAttester.address,
+    collectionIdFirst: config.githubAttester.collectionIdFirst,
+    collectionIdLast: config.githubAttester.collectionIdLast,
     options: getCommonOptions(options),
   } as AuthorizeRangeArgs);
 
@@ -255,6 +289,12 @@ async function deploymentAction(
       -> implem: ${(await hre.deployments.all()).HydraS1SoulboundAttesterImplem.address}
       collectionIdFirst: ${config.hydraS1SoulboundAttester.collectionIdFirst}
       collectionIdLast: ${config.hydraS1SoulboundAttester.collectionIdLast}
+
+    * GithubAttester:
+      -> proxy: ${(await hre.deployments.all()).GithubAttester.address}
+      -> implem: ${(await hre.deployments.all()).GithubAttester.address}
+      collectionIdFirst: ${config.githubAttester.collectionIdFirst}
+      collectionIdLast: ${config.githubAttester.collectionIdLast}
     
     * AvailableRootsRegistry: 
       -> proxy: ${(await hre.deployments.all()).AvailableRootsRegistry.address}
@@ -272,6 +312,7 @@ async function deploymentAction(
   return {
     hydraS1SimpleAttester,
     hydraS1SoulboundAttester,
+    githubAttester,
     availableRootsRegistry,
     commitmentMapperRegistry,
     front,

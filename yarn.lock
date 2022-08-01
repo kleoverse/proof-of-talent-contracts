@@ -782,7 +782,7 @@
     "@sismo-core/crypto" "^1.0.2"
     tslib "^2.4.0"
 
-"@sismo-core/crypto@^1.0.1", "@sismo-core/crypto@^1.0.2", "@sismo-core/crypto@^1.1.4":
+"@sismo-core/crypto@^1.0.1", "@sismo-core/crypto@^1.1.4":
   version "1.1.4"
   resolved "https://registry.npmjs.org/@sismo-core/crypto/-/crypto-1.1.4.tgz"
   integrity sha512-UvUDpRVZrQNxeXCS5y4Dza9pZr/bUHQwZp0Rzma71ak9xF8sKpnIXdBs9kiLO3uPyE3WQnuUKlEmFQJ13HdoMw==
@@ -790,6 +790,7 @@
     circomlib "^2.0.3"
     circomlibjs "^0.1.2"
     ethers "^5.6.1"
+
 "@sismo-core/crypto@^1.0.2":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@sismo-core/crypto/-/crypto-1.0.3.tgz#300d2e8172f510824aee9d514f94dcaa6575d757"
@@ -10271,7 +10272,7 @@ uuid@^3.3.2:
 
 uuid@^8.3.2:
   version "8.3.2"
-  resolved "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
 
 v8-compile-cache-lib@^3.0.0:

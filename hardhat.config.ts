@@ -35,6 +35,11 @@ const SISMO_SHARED_MNEMONIC =
   'analyst decade album recall stem run cage ozone human pepper once insect';
 const MNEMONIC = process.env.MNEMONIC || SISMO_SHARED_MNEMONIC;
 
+// const privateKey = process.env.RINKEBY_PRIVATE_KEY;
+// if (!privateKey) {
+//   throw new Error("Please set your private key in a .env file");
+// }
+
 const INFURA_KEY = process.env.INFURA_KEY || '';
 const ALCHEMY_KEY = process.env.ALCHEMY_KEY || '';
 
