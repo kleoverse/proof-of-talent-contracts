@@ -21,6 +21,7 @@ contract GithubAttesterOracle is AttesterOracle {
   *******************************************************/
   /**
    * @dev Constructor. Initializes the contract
+   * @param owner Owner of the contract
    * @param attestationsRegistryAddress Attestations Registry contract on which the attester will write attestations
    * @param attesterOracleAddress  Address of the oracle
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record

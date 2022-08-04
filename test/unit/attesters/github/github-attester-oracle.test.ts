@@ -46,7 +46,7 @@ const config = deploymentsConfig[hre.network.name];
 const collectionIdFirst = BigNumber.from(config.githubAttesterOracle.collectionIdFirst);
 const collectionIdLast = BigNumber.from(config.githubAttesterOracle.collectionIdLast);
 
-describe('Test Github attester contract', () => {
+describe('Test Github attester oracle contract', () => {
   let chainId: number;
 
   // contracts
