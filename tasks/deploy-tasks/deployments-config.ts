@@ -54,7 +54,7 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
-    githubAttester: {
+    githubAttesterOracle: {
       owner: ALPHA_POLYGON_OWNER,
       collectionIdFirst: '100001',
       collectionIdLast: '200000',
@@ -100,7 +100,7 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
-    githubAttester: {
+    githubAttesterOracle: {
       owner: ALPHA_RINKEBY_OWNER,
       collectionIdFirst: '100001',
       collectionIdLast: '200000',
@@ -145,7 +145,7 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
     },
-    githubAttester: {
+    githubAttesterOracle: {
       owner: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
       collectionIdFirst: '100001',
       collectionIdLast: '200000',
@@ -190,7 +190,7 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
     },
-    githubAttester: {
+    githubAttesterOracle: {
       owner: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
       collectionIdFirst: '300001',
       collectionIdLast: '400000',

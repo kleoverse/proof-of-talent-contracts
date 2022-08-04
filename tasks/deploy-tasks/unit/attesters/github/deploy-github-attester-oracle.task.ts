@@ -8,12 +8,12 @@ import {
   customDeployContract,
   wrapCommonDeployOptions,
   DeployOptions,
-} from '../../../../../tasks/deploy-tasks/utils';
+} from '../../../utils';
 
-import { GithubAttester, GithubAttester__factory } from '../../../../../types';
+import { GithubAttesterOracle, GithubAttesterOracle__factory } from '../../../../../types';
 import { BigNumber, BigNumberish } from 'ethers';
 
-export interface DeployGithubAttesterArgs {
+export interface DeployGithubAttesterOracleArgs {
   owner: string;
   // address of the attester oracle
   attesterOracleAddress: string;
@@ -26,11 +26,11 @@ export interface DeployGithubAttesterArgs {
   options?: DeployOptions;
 }
 
-export interface DeployedGithubAttester {
-  githubAttester: GithubAttester;
+export interface DeployedGithubAttesterOracle {
+  githubAttesterOracle: GithubAttesterOracle;
 }
 
-const CONTRACT_NAME = 'GithubAttester';
+const CONTRACT_NAME = 'GithubAttesterOracle';
 
 async function deploymentAction(
   {
@@ -40,9 +40,9 @@ async function deploymentAction(
     collectionIdFirst = 100,
     collectionIdLast = 0,
     options,
-  }: DeployGithubAttesterArgs,
+  }: DeployGithubAttesterOracleArgs,
   hre: HardhatRuntimeEnvironment
-): Promise<DeployedGithubAttester> {
+): Promise<DeployedGithubAttesterOracle> {
   const deployer = await getDeployer(hre);
   const deploymentName = buildDeploymentName(CONTRACT_NAME, options?.deploymentNamePrefix);
 
@@ -73,11 +73,11 @@ async function deploymentAction(
 
   await afterDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, deployed, options);
 
-  const githubAttester = GithubAttester__factory.connect(deployed.address, deployer);
-  return { githubAttester };
+  const githubAttesterOracle = GithubAttesterOracle__factory.connect(deployed.address, deployer);
+  return { githubAttesterOracle };
 }
 
-task('deploy-github-attester')
+task('deploy-github-attester-oracle')
   .addParam('collectionIdFirst', '')
   .addParam('collectionIdLast', '')
   .addParam('owner', 'Address of the owner')

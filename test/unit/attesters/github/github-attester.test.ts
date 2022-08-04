@@ -5,7 +5,7 @@ import {
   AvailableRootsRegistry,
   Badges,
   CommitmentMapperRegistry,
-  GithubAttester,
+  GithubAttesterOracle,
   HydraS1SimpleAttester,
 } from 'types';
 import { RequestStruct } from 'types/Attester';
@@ -43,15 +43,15 @@ import {
 import { getEventArgs } from '../../../utils/expectEvent';
 
 const config = deploymentsConfig[hre.network.name];
-const collectionIdFirst = BigNumber.from(config.githubAttester.collectionIdFirst);
-const collectionIdLast = BigNumber.from(config.githubAttester.collectionIdLast);
+const collectionIdFirst = BigNumber.from(config.githubAttesterOracle.collectionIdFirst);
+const collectionIdLast = BigNumber.from(config.githubAttesterOracle.collectionIdLast);
 
 describe('Test Github attester contract', () => {
   let chainId: number;
 
   // contracts
   let attestationsRegistry: AttestationsRegistry;
-  let githubAttester: GithubAttester;
+  let githubAttesterOracle: GithubAttesterOracle;
   let hydraS1SimpleAttester: HydraS1SimpleAttester;
   let availableRootsRegistry: AvailableRootsRegistry;
   let commitmentMapperRegistry: CommitmentMapperRegistry;
@@ -128,18 +128,18 @@ describe('Test Github attester contract', () => {
         commitmentMapperRegistry,
         hydraS1SimpleAttester,
         availableRootsRegistry,
-        githubAttester,
+        githubAttesterOracle,
       } = (await hre.run('0-deploy-core-and-hydra-s1-simple-and-soulbound', {
         options: { log: false },
       })) as Deployed0);
       // const root = registryTree.getRoot();
       // await availableRootsRegistry.registerRootForAttester(hydraS1SimpleAttester.address, root);
       roles = {
-        admin: await githubAttester.DEFAULT_ADMIN_ROLE(),
-        attester_oracle: await githubAttester.ATTESTER_ORACLE_ROLE(),
+        admin: await githubAttesterOracle.DEFAULT_ADMIN_ROLE(),
+        attester_oracle: await githubAttesterOracle.ATTESTER_ORACLE_ROLE(),
       };
 
-      expect(await githubAttester.hasRole(roles.admin, deployer.address)).to.be.true;
+      expect(await githubAttesterOracle.hasRole(roles.admin, deployer.address)).to.be.true;
     });
   });
 
@@ -159,7 +159,7 @@ describe('Test Github attester contract', () => {
         ],
         destination: BigNumber.from(destination1.account).toHexString(),
       };
-      const tx = await githubAttester.requestVerifyRequestCallback(request);
+      const tx = await githubAttesterOracle.requestVerifyRequestCallback(request);
       const { events } = await tx.wait();
       expect(events && events[0].event).to.equal('VerifyRequest');
       expect(events && events[0].args?.[1]).to.equal(deployer.address);
@@ -182,8 +182,8 @@ describe('Test Github attester contract', () => {
         ],
         destination: BigNumber.from(destination1.account).toHexString(),
       };
-      const tx = await githubAttester.requestVerifyRequestCallback(request);
-      await expect(githubAttester.generateAttestations(request, '0x')).to.be.revertedWith(
+      const tx = await githubAttesterOracle.requestVerifyRequestCallback(request);
+      await expect(githubAttesterOracle.generateAttestations(request, '0x')).to.be.revertedWith(
         `AccessControl: account ${deployer.address.toLowerCase()} is missing role ${
           roles.attester_oracle
         }`
@@ -203,15 +203,17 @@ describe('Test Github attester contract', () => {
       console.log(
         'Deployer address: ',
         deployer.address,
-        await githubAttester.getAttestationRegistry()
+        await githubAttesterOracle.getAttestationRegistry()
       );
-      await githubAttester.grantRole(roles.attester_oracle, attesterOracle.address);
-      await githubAttester.requestVerifyRequestCallback(request);
-      const tx = await githubAttester.connect(attesterOracle).generateAttestations(request, '0x');
+      await githubAttesterOracle.grantRole(roles.attester_oracle, attesterOracle.address);
+      await githubAttesterOracle.requestVerifyRequestCallback(request);
+      const tx = await githubAttesterOracle
+        .connect(attesterOracle)
+        .generateAttestations(request, '0x');
       const { events } = await tx.wait();
       const args = getEventArgs(events, 'AttestationGenerated');
 
-      expect(args.attestation.issuer).to.equal(githubAttester.address);
+      expect(args.attestation.issuer).to.equal(githubAttesterOracle.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(1);

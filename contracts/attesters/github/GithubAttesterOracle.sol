@@ -8,7 +8,7 @@ import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {AttesterOracle, IAttesterOracle, IAttestationsRegistry} from './../../core/AttesterOracle.sol';
 import {GithubGroupProperties} from './libs/GithubAttesterLib.sol';
 
-contract GithubAttester is AttesterOracle {
+contract GithubAttesterOracle is AttesterOracle {
   // The deployed contract will need to be authorized to write into the Attestation registry
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;

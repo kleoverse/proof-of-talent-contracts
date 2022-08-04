@@ -27,7 +27,7 @@ export type DeploymentsConfigTypes = {
       collectionIdLast: string;
       initialRoot: string;
     };
-    githubAttester: {
+    githubAttesterOracle: {
       owner: string;
       collectionIdFirst: string;
       collectionIdLast: string;
