@@ -21,6 +21,7 @@ contract GithubAttester is IGithubAttester, Attester, EIP712 {
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
   address internal _verifierAddress;
+  mapping(address => address) internal _sourcesToDestinations;
 
   /*******************************************************
     INITIALIZATION FUNCTIONS                           
@@ -127,5 +128,34 @@ contract GithubAttester is IGithubAttester, Attester, EIP712 {
     internal
     virtual
     override
-  {}
+  {
+    address currentDestination = _getDestinationOfSource(msg.sender);
+
+    if (currentDestination != address(0) && currentDestination != request.destination) {
+      revert SourceAlreadyUsed(msg.sender);
+    }
+
+    _setDestinationForSource(msg.sender, request.destination);
+  }
+
+  /*******************************************************
+    Github Attester Specific Functions
+  *******************************************************/
+
+  /**
+   * @dev Getter, returns the last attestation destination of a source
+   * @param source address used
+   **/
+  function getDestinationOfSource(address source) external view override returns (address) {
+    return _getDestinationOfSource(source);
+  }
+
+  function _setDestinationForSource(address source, address destination) internal virtual {
+    _sourcesToDestinations[source] = destination;
+    emit SourceToDestinationUpdated(source, destination);
+  }
+
+  function _getDestinationOfSource(address source) internal view returns (address) {
+    return _sourcesToDestinations[source];
+  }
 }
