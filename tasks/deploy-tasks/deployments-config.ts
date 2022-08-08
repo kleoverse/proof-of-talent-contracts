@@ -18,13 +18,15 @@ const COMMITMENT_MAPPER_TESTER = [
 
 const THREE_DAYS = '295200';
 // Rinkeby
-const ALPHA_RINKEBY_OWNER = '0x4e070E9b85a659F0B7B47cde33152ad6c2F63954';
-const ALPHA_RINKEBY_ROOTS_OWNER_RELAYER = '0x5de4009c77d51782014bb16238ec32971ae9f8d0';
-const ALPHA_RINKEBY_PROXY_ADMIN = '0x246E71bC2a257f4BE9C7fAD4664E6D7444844Adc';
+const ALPHA_RINKEBY_OWNER = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
+const ALPHA_RINKEBY_ROOTS_OWNER_RELAYER = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
+const ALPHA_RINKEBY_PROXY_ADMIN = '0x98941094d282ddA631031283EA70ec9e81246638';
+const ALPHA_RINKEBY_VERIFIER = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
 // Polygon
 const ALPHA_POLYGON_OWNER = '0xaee4acd5c4Bf516330ca8fe11B07206fC6709294';
 const ALPHA_POLYGON_ROOTS_OWNER_RELAYER = '0xf0a0b692e1c764281c211948d03edeef5fb57111';
 const ALPHA_POLYGON_PROXY_ADMIN = '0x2110475dfbB8d331b300178A867372991ff35fA3';
+const ALPHA_POLYGON_VERIFIER = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
 
 export const deploymentsConfig: DeploymentsConfigTypes = {
   polygon: {
@@ -53,6 +55,11 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdLast: '30000000',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
+    },
+    githubAttester: {
+      collectionIdFirst: '300001',
+      collectionIdLast: '400000',
+      verifierAddress: ALPHA_RINKEBY_VERIFIER,
     },
     attestationsRegistry: {
       owner: ALPHA_POLYGON_OWNER,
@@ -95,6 +102,11 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
+    githubAttester: {
+      collectionIdFirst: '300001',
+      collectionIdLast: '400000',
+      verifierAddress: ALPHA_POLYGON_VERIFIER,
+    },
     attestationsRegistry: {
       owner: ALPHA_RINKEBY_OWNER,
     },
@@ -135,6 +147,11 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
     },
+    githubAttester: {
+      collectionIdFirst: '300001',
+      collectionIdLast: '400000',
+      verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
+    },
     attestationsRegistry: {
       owner: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
     },
@@ -174,6 +191,11 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdLast: '300000',
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
+    },
+    githubAttester: {
+      collectionIdFirst: '300001',
+      collectionIdLast: '400000',
+      verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
     },
     attestationsRegistry: {
       owner: '0xb01ee322c4f028b8a6bfcd2a5d48107dc5bc99ec',
