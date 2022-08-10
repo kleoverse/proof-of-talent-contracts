@@ -104,31 +104,8 @@ describe('Test Github attester contract', () => {
         ],
         destination: destination1.account,
       };
-      const signData = {
-        primaryType: 'AttestationRequest',
-        domain: {
-          name: 'GithubAttester',
-          version: '1',
-          chainId: hre.network.config.chainId,
-          verifyingContract: githubAttester.address,
-        },
-        types: {
-          AttestationRequest: [
-            { name: 'groupId', type: 'uint256' },
-            { name: 'claimedValue', type: 'uint256' },
-            { name: 'extraData', type: 'bytes' },
-            { name: 'destination', type: 'address' },
-            { name: 'deadline', type: 'uint256' },
-          ],
-        },
-        message: {
-          groupId: request.claims[0].groupId,
-          claimedValue: request.claims[0].claimedValue,
-          extraData: request.claims[0].extraData,
-          destination: request.destination,
-          deadline,
-        },
-      };
+
+      const signData = generateEIP712TypedSignData(request, githubAttester.address, deadline);
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
       const { r, s, v } = utils.splitSignature(sig);
       const data = ethers.utils.defaultAbiCoder.encode(
@@ -159,31 +136,7 @@ describe('Test Github attester contract', () => {
         ],
         destination: destination1.account,
       };
-      const signData = {
-        primaryType: 'AttestationRequest',
-        domain: {
-          name: 'GithubAttester',
-          version: '1',
-          chainId: hre.network.config.chainId,
-          verifyingContract: githubAttester.address,
-        },
-        types: {
-          AttestationRequest: [
-            { name: 'groupId', type: 'uint256' },
-            { name: 'claimedValue', type: 'uint256' },
-            { name: 'extraData', type: 'bytes' },
-            { name: 'destination', type: 'address' },
-            { name: 'deadline', type: 'uint256' },
-          ],
-        },
-        message: {
-          groupId: request.claims[0].groupId,
-          claimedValue: request.claims[0].claimedValue,
-          extraData: request.claims[0].extraData,
-          destination: request.destination,
-          deadline,
-        },
-      };
+      const signData = generateEIP712TypedSignData(request, githubAttester.address, deadline);
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
       const { r, s, v } = utils.splitSignature(sig);
       const data = ethers.utils.defaultAbiCoder.encode(
