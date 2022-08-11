@@ -1,25 +1,28 @@
 import { BigNumber, ethers } from 'ethers';
-import { RequestStruct } from 'types/GithubAttester';
+import { RequestStruct } from 'types/IdentityAttester';
 import { v4 as uuidv4 } from 'uuid';
+import randomstring from 'randomstring';
 import hre from 'hardhat';
 
-export const GithubAttesterDomainName = 'GithubAttester';
+export const IdentityAttesterDomainName = 'IdentityAttester';
 /*************************************************/
 /**************    MOCK ACCOUNTS     *************/
 /*************************************************/
 
-export type GithubAccountData = {
+export type IdentityAccountData = {
   identifier: string;
   account: string;
+  username: string;
 };
 
-export const generateGithubAccounts = async (signers): Promise<GithubAccountData[]> => {
-  const accounts: GithubAccountData[] = [];
+export const generateIdentityAccounts = async (signers): Promise<IdentityAccountData[]> => {
+  const accounts: IdentityAccountData[] = [];
   for (const signer of signers) {
     const address = BigNumber.from(signer.address).toHexString();
     accounts.push({
       identifier: uuidv4(),
       account: address,
+      username: randomstring.generate(),
     });
   }
   return accounts;
@@ -29,9 +32,9 @@ export const generateGithubAccounts = async (signers): Promise<GithubAccountData
 /****************    DATA SOURCE     *************/
 /*************************************************/
 
-export type GithubList = { [address: string]: number };
+export type IdentityList = { [address: string]: number };
 
-export const generateGithubLists = (Accounts: GithubAccountData[]): GithubList[] => {
+export const generateIdentityLists = (Accounts: IdentityAccountData[]): IdentityList[] => {
   const List1 = {};
   const List2 = {};
   Accounts.forEach((account, index) => {
@@ -41,33 +44,35 @@ export const generateGithubLists = (Accounts: GithubAccountData[]): GithubList[]
   return [List1, List2];
 };
 
-export type GithubGroup = {
-  data: GithubList;
-  properties: GithubGroupProperties;
+export type IdentityGroup = {
+  data: IdentityList;
+  properties: IdentityGroupProperties;
   id: string;
 };
 
-export type GithubGroupProperties = {
+export type IdentityGroupProperties = {
   groupIndex: number;
   generationTimestamp: number;
+  identityType: string;
 };
 
-export type GithubAttesterGroups = {
-  groups: GithubGroup[];
+export type IdentityAttesterGroups = {
+  groups: IdentityGroup[];
 };
 
-export const generateGithubAttesterGroups = async (
-  allList: GithubList[]
-): Promise<GithubAttesterGroups> => {
+export const generateIdentityAttesterGroups = async (
+  allList: IdentityList[]
+): Promise<IdentityAttesterGroups> => {
   /*********************** GENERATE GROUPS *********************/
 
-  const groups: GithubGroup[] = [];
+  const groups: IdentityGroup[] = [];
   let generationTimestamp = Math.round(Date.now() / 1000);
 
   for (let i = 0; i < allList.length; i++) {
     const properties = {
       groupIndex: i,
       generationTimestamp,
+      identityType: 'github',
     };
 
     groups.push({
@@ -83,9 +88,19 @@ export const generateGithubAttesterGroups = async (
   };
 };
 
-export const encodeGithubGroupProperties = (groupProperties: GithubGroupProperties): string => {
+export const encodeIdentityGroupProperties = (
+  groupProperties: IdentityGroupProperties,
+  accountId: string,
+  username: string
+): string => {
   return ethers.utils.defaultAbiCoder.encode(
-    ['uint128', 'uint32'],
-    [groupProperties.groupIndex, groupProperties.generationTimestamp]
+    ['uint128', 'uint32', 'string', 'string', 'string'],
+    [
+      groupProperties.groupIndex,
+      groupProperties.generationTimestamp,
+      groupProperties.identityType,
+      accountId,
+      username,
+    ]
   );
 };
