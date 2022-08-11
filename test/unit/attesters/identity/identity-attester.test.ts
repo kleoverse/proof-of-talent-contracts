@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
-import { AttestationsRegistry, Badges, GithubAttester } from 'types';
+import { AttestationsRegistry, Badges, IdentityAttester } from 'types';
 import { RequestStruct } from 'types/Attester';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -9,29 +9,29 @@ import { BigNumber, utils } from 'ethers';
 import { Deployed0 } from 'tasks/deploy-tasks/full/0-deploy-core-and-hydra-s1-simple-and-soulbound.task';
 import { deploymentsConfig } from '../../../../tasks/deploy-tasks/deployments-config';
 import {
-  encodeGithubGroupProperties,
+  encodeIdentityGroupProperties,
   generateEIP712TypedSignData,
   generateEIP712TypedSignDataWithDomainType,
-  generateGithubAccounts,
-  generateGithubAttesterGroups,
-  generateGithubLists,
-  GithubAccountData,
-  GithubAttesterDomainName,
-  GithubGroup,
+  generateIdentityAccounts,
+  generateIdentityAttesterGroups,
+  generateIdentityLists,
+  IdentityAccountData,
+  IdentityGroup,
+  IdentityAttesterDomainName,
 } from '../../../utils';
 import { getEventArgs } from '../../../utils/expectEvent';
 import { getAddress } from 'ethers/lib/utils';
 
 const config = deploymentsConfig[hre.network.name];
-const collectionIdFirst = BigNumber.from(config.githubAttester.collectionIdFirst);
-const collectionIdLast = BigNumber.from(config.githubAttester.collectionIdLast);
+const collectionIdFirst = BigNumber.from(config.identityAttester.collectionIdFirst);
+const collectionIdLast = BigNumber.from(config.identityAttester.collectionIdLast);
 
-describe('Test Github attester contract', () => {
+describe('Test Identity attester contract', () => {
   let chainId: number;
 
   // contracts
   let attestationsRegistry: AttestationsRegistry;
-  let githubAttester: GithubAttester;
+  let identityAttester: IdentityAttester;
   let badges: Badges;
 
   // Test Signers
@@ -41,14 +41,14 @@ describe('Test Github attester contract', () => {
   let attesterOracle: SignerWithAddress;
 
   // Test accounts
-  let source1: GithubAccountData;
-  let destination1: GithubAccountData;
-  let destination2: GithubAccountData;
+  let source1: IdentityAccountData;
+  let destination1: IdentityAccountData;
+  let destination2: IdentityAccountData;
 
   // Data source test
   let source1Value: number;
-  let group1: GithubGroup;
-  let group2: GithubGroup;
+  let group1: IdentityGroup;
+  let group2: IdentityGroup;
 
   // Valid request and proof
   let request: RequestStruct;
@@ -57,15 +57,15 @@ describe('Test Github attester contract', () => {
     const signers = await hre.ethers.getSigners();
     [deployer, randomSigner, proxyAdminSigner, attesterOracle] = signers;
 
-    let accounts: GithubAccountData[] = await generateGithubAccounts(signers);
+    let accounts: IdentityAccountData[] = await generateIdentityAccounts(signers);
 
     source1 = accounts[0];
     destination1 = accounts[1];
     destination2 = accounts[3];
 
     // Generate data source
-    const allList = await generateGithubLists(accounts);
-    const { groups } = await generateGithubAttesterGroups(allList);
+    const allList = await generateIdentityLists(accounts);
+    const { groups } = await generateIdentityAttesterGroups(allList);
 
     group1 = groups[0];
     group2 = groups[1];
@@ -78,7 +78,7 @@ describe('Test Github attester contract', () => {
 
   describe('Deployments', () => {
     it('Should deploy and setup core', async () => {
-      ({ attestationsRegistry, badges, githubAttester } = (await hre.run(
+      ({ attestationsRegistry, badges, identityAttester } = (await hre.run(
         '0-deploy-core-and-hydra-s1-simple-and-soulbound',
         {
           options: { log: false },
@@ -100,7 +100,11 @@ describe('Test Github attester contract', () => {
           {
             groupId: group1.id,
             claimedValue: source1Value,
-            extraData: encodeGithubGroupProperties(group1.properties),
+            extraData: encodeIdentityGroupProperties(
+              group1.properties,
+              source1.account,
+              source1.username
+            ),
           },
         ],
         destination: destination1.account,
@@ -108,9 +112,9 @@ describe('Test Github attester contract', () => {
 
       const signData = generateEIP712TypedSignData(
         request,
-        githubAttester.address,
+        identityAttester.address,
         deadline,
-        GithubAttesterDomainName
+        IdentityAttesterDomainName
       );
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
       const { r, s, v } = utils.splitSignature(sig);
@@ -118,15 +122,16 @@ describe('Test Github attester contract', () => {
         ['uint8', 'bytes32', 'bytes32', 'uint256'],
         [v, r, s, deadline]
       );
-      const tx = await githubAttester.generateAttestations(request, data);
+      const tx = await identityAttester.generateAttestations(request, data);
       const { events } = await tx.wait();
       const args = getEventArgs(events, 'AttestationGenerated');
 
-      expect(args.attestation.issuer).to.equal(githubAttester.address);
+      expect(args.attestation.issuer).to.equal(identityAttester.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(1);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
+      expect(args.attestation.extraData).to.equal(request.claims[0].extraData);
     });
     it('Should update existing attestation', async () => {
       const deadline = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
@@ -137,16 +142,20 @@ describe('Test Github attester contract', () => {
             groupId: group1.id,
             // UPATED value here
             claimedValue: source1Value + 1,
-            extraData: encodeGithubGroupProperties(group1.properties),
+            extraData: encodeIdentityGroupProperties(
+              group1.properties,
+              source1.account,
+              source1.username
+            ),
           },
         ],
         destination: destination1.account,
       };
       const signData = generateEIP712TypedSignData(
         request,
-        githubAttester.address,
+        identityAttester.address,
         deadline,
-        GithubAttesterDomainName
+        IdentityAttesterDomainName
       );
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
       const { r, s, v } = utils.splitSignature(sig);
@@ -154,15 +163,16 @@ describe('Test Github attester contract', () => {
         ['uint8', 'bytes32', 'bytes32', 'uint256'],
         [v, r, s, deadline]
       );
-      const tx = await githubAttester.generateAttestations(request, data);
+      const tx = await identityAttester.generateAttestations(request, data);
       const { events } = await tx.wait();
       const args = getEventArgs(events, 'AttestationGenerated');
 
-      expect(args.attestation.issuer).to.equal(githubAttester.address);
+      expect(args.attestation.issuer).to.equal(identityAttester.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(2);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
+      expect(args.attestation.extraData).to.equal(request.claims[0].extraData);
     });
   });
 
@@ -183,7 +193,11 @@ describe('Test Github attester contract', () => {
           {
             groupId: group1.id,
             claimedValue: source1Value,
-            extraData: encodeGithubGroupProperties(group1.properties),
+            extraData: encodeIdentityGroupProperties(
+              group1.properties,
+              source1.account,
+              source1.username
+            ),
           },
         ],
         destination: destination1.account,
@@ -193,7 +207,11 @@ describe('Test Github attester contract', () => {
           {
             groupId: group1.id,
             claimedValue: source1Value + 1,
-            extraData: encodeGithubGroupProperties(group1.properties),
+            extraData: encodeIdentityGroupProperties(
+              group1.properties,
+              source1.account,
+              source1.username
+            ),
           },
         ],
         destination: destination1.account,
@@ -201,9 +219,9 @@ describe('Test Github attester contract', () => {
 
       const signData = generateEIP712TypedSignData(
         request,
-        githubAttester.address,
+        identityAttester.address,
         deadline,
-        GithubAttesterDomainName
+        IdentityAttesterDomainName
       );
       const signDataWithType = generateEIP712TypedSignDataWithDomainType(signData);
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
@@ -224,8 +242,8 @@ describe('Test Github attester contract', () => {
         ['uint8', 'bytes32', 'bytes32', 'uint256'],
         [v, r, s, deadline]
       );
-      await expect(githubAttester.generateAttestations(forgedRequest, data))
-        .to.be.revertedWithCustomError(githubAttester, `SignatureInvalid`)
+      await expect(identityAttester.generateAttestations(forgedRequest, data))
+        .to.be.revertedWithCustomError(identityAttester, `SignatureInvalid`)
         .withArgs(deployer.address, getAddress(recovered));
     });
 
@@ -243,16 +261,20 @@ describe('Test Github attester contract', () => {
           {
             groupId: group1.id,
             claimedValue: source1Value,
-            extraData: encodeGithubGroupProperties(group1.properties),
+            extraData: encodeIdentityGroupProperties(
+              group1.properties,
+              source1.account,
+              source1.username
+            ),
           },
         ],
         destination: destination1.account,
       };
       const signData = generateEIP712TypedSignData(
         request,
-        githubAttester.address,
+        identityAttester.address,
         deadline,
-        GithubAttesterDomainName
+        IdentityAttesterDomainName
       );
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
       const { r, s, v } = utils.splitSignature(sig);
@@ -260,8 +282,8 @@ describe('Test Github attester contract', () => {
         ['uint8', 'bytes32', 'bytes32', 'uint256'],
         [v, r, s, deadline]
       );
-      await expect(githubAttester.generateAttestations(request, data))
-        .to.be.revertedWithCustomError(githubAttester, 'SignatureDeadlineExpired')
+      await expect(identityAttester.generateAttestations(request, data))
+        .to.be.revertedWithCustomError(identityAttester, 'SignatureDeadlineExpired')
         .withArgs(deadline);
     });
 
@@ -273,7 +295,11 @@ describe('Test Github attester contract', () => {
           {
             groupId: group1.id,
             claimedValue: source1Value,
-            extraData: encodeGithubGroupProperties(group1.properties),
+            extraData: encodeIdentityGroupProperties(
+              group1.properties,
+              source1.account,
+              source1.username
+            ),
           },
         ],
         destination: destination1.account,
@@ -282,7 +308,7 @@ describe('Test Github attester contract', () => {
         request,
         randomSigner.address,
         deadline,
-        GithubAttesterDomainName
+        IdentityAttesterDomainName
       );
       const signDataWithType = generateEIP712TypedSignDataWithDomainType(signData);
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
@@ -292,7 +318,7 @@ describe('Test Github attester contract', () => {
           ...signDataWithType,
           domain: {
             ...signDataWithType.domain,
-            verifyingContract: githubAttester.address,
+            verifyingContract: identityAttester.address,
           },
         },
         signature: sig,
@@ -303,8 +329,8 @@ describe('Test Github attester contract', () => {
         ['uint8', 'bytes32', 'bytes32', 'uint256'],
         [v, r, s, deadline]
       );
-      await expect(githubAttester.generateAttestations(request, data))
-        .to.be.revertedWithCustomError(githubAttester, `SignatureInvalid`)
+      await expect(identityAttester.generateAttestations(request, data))
+        .to.be.revertedWithCustomError(identityAttester, `SignatureInvalid`)
         .withArgs(deployer.address, getAddress(recovered));
     });
 
@@ -316,7 +342,11 @@ describe('Test Github attester contract', () => {
           {
             groupId: group1.id,
             claimedValue: source1Value,
-            extraData: encodeGithubGroupProperties(group1.properties),
+            extraData: encodeIdentityGroupProperties(
+              group1.properties,
+              source1.account,
+              source1.username
+            ),
           },
         ],
         destination: destination1.account,
@@ -324,9 +354,9 @@ describe('Test Github attester contract', () => {
 
       const signData = generateEIP712TypedSignData(
         request,
-        githubAttester.address,
+        identityAttester.address,
         deadline,
-        GithubAttesterDomainName
+        IdentityAttesterDomainName
       );
       const sig = await randomSigner._signTypedData(
         signData.domain,
@@ -338,8 +368,8 @@ describe('Test Github attester contract', () => {
         ['uint8', 'bytes32', 'bytes32', 'uint256'],
         [v, r, s, deadline]
       );
-      await expect(githubAttester.generateAttestations(request, data))
-        .to.be.revertedWithCustomError(githubAttester, `SignatureInvalid`)
+      await expect(identityAttester.generateAttestations(request, data))
+        .to.be.revertedWithCustomError(identityAttester, `SignatureInvalid`)
         .withArgs(deployer.address, randomSigner.address);
     });
   });
@@ -355,9 +385,9 @@ describe('Test Github attester contract', () => {
       wrongRequest.destination = destination2.account;
       const signData = generateEIP712TypedSignData(
         wrongRequest,
-        githubAttester.address,
+        identityAttester.address,
         deadline,
-        GithubAttesterDomainName
+        IdentityAttesterDomainName
       );
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
       const { r, s, v } = utils.splitSignature(sig);
@@ -366,8 +396,8 @@ describe('Test Github attester contract', () => {
         [v, r, s, deadline]
       );
 
-      await expect(githubAttester.generateAttestations(wrongRequest, data))
-        .to.be.revertedWithCustomError(githubAttester, `SourceAlreadyUsed`)
+      await expect(identityAttester.generateAttestations(wrongRequest, data))
+        .to.be.revertedWithCustomError(identityAttester, `SourceAlreadyUsed`)
         .withArgs(deployer.address);
     });
   });

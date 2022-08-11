@@ -32,6 +32,11 @@ export type DeploymentsConfigTypes = {
       collectionIdLast: string;
       verifierAddress: string;
     };
+    identityAttester: {
+      collectionIdFirst: string;
+      collectionIdLast: string;
+      verifierAddress: string;
+    };
     // Conf related to the commitment mapper
     // https://github.com/sismo-core/sismo-commitment-mapper
     commitmentMapper: {
