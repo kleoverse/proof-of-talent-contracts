@@ -6,3 +6,4 @@ export * from './hydra-s1';
 export * from './github';
 export * from './identity';
 export * from './eip712';
+export * from './githubMerkle';

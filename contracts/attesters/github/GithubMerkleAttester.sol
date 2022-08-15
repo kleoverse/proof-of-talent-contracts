@@ -1,25 +1,22 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.14;
+pragma experimental ABIEncoderV2;
 
-import '@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol';
+import '@openzeppelin/contracts/utils/cryptography/MerkleProof.sol';
 // Core protocol Protocol imports
-import {IIdentityAttester} from './interfaces/IIdentityAttester.sol';
+import {IGithubMerkleAttester} from './interfaces/IGithubMerkleAttester.sol';
 import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.sol';
-import {IdentityGroupProperties, EIP712Signature} from './libs/IdentityAttesterLib.sol';
+import {GithubGroupProperties, IdentityGroupProperties, MerkleProofData} from './libs/GithubMerkleAttesterLib.sol';
+import {IAvailableRootsRegistry} from '../../periphery/utils/AvailableRootsRegistry.sol';
 
-contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
-  bytes32 private constant _ATTESTATION_REQUEST_TYPEHASH =
-    keccak256(
-      'AttestationRequest(uint256 groupId,uint256 claimedValue,bytes extraData,address destination,uint256 deadline)'
-    );
-
+contract GithubMerkleAttester is IGithubMerkleAttester, Attester {
   // The deployed contract will need to be authorized to write into the Attestation registry
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
-  address internal _verifierAddress;
+  IAvailableRootsRegistry immutable AVAILABLE_ROOTS_REGISTRY;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
   /*******************************************************
@@ -33,13 +30,13 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
    */
   constructor(
     address attestationsRegistryAddress,
+    address availableRootsRegistryAddress,
     uint256 collectionIdFirst,
-    uint256 collectionIdLast,
-    address verifierAddress
-  ) Attester(attestationsRegistryAddress) EIP712('IdentityAttester', '1') {
+    uint256 collectionIdLast
+  ) Attester(attestationsRegistryAddress) {
     AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
     AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
-    _verifierAddress = verifierAddress;
+    AVAILABLE_ROOTS_REGISTRY = IAvailableRootsRegistry(availableRootsRegistryAddress);
   }
 
   /*******************************************************
@@ -56,27 +53,20 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
     virtual
     override
   {
-    EIP712Signature memory sig = abi.decode(proofData, (EIP712Signature));
-    if (sig.deadline < block.timestamp) {
-      revert SignatureDeadlineExpired(sig.deadline);
-    }
-    bytes32 structHash = keccak256(
-      abi.encode(
-        _ATTESTATION_REQUEST_TYPEHASH,
-        request.claims[0].groupId,
-        request.claims[0].claimedValue,
-        keccak256(request.claims[0].extraData),
-        request.destination,
-        sig.deadline
-      )
+    Claim memory claim = request.claims[0];
+
+    MerkleProofData memory merkleProofData = abi.decode(proofData, (MerkleProofData));
+
+    _verifyAuthentication(merkleProofData);
+
+    if (!AVAILABLE_ROOTS_REGISTRY.isRootAvailableForMe(claim.groupId)) revert GroupNotAvailable();
+
+    bytes32 hashedAccount = keccak256(
+      abi.encodePacked(merkleProofData.accountId, claim.claimedValue)
     );
 
-    bytes32 hash = _hashTypedDataV4(structHash);
-
-    address signer = ECDSA.recover(hash, sig.v, sig.r, sig.s);
-    if (signer != _verifierAddress) {
-      revert SignatureInvalid(_verifierAddress, signer);
-    }
+    if (!MerkleProof.verify(merkleProofData.path, bytes32(claim.groupId), hashedAccount))
+      revert ClaimInvalid();
   }
 
   /**
@@ -91,14 +81,14 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
     returns (Attestation[] memory)
   {
     Claim memory claim = request.claims[0];
-    IdentityGroupProperties memory groupProperties = abi.decode(
+    GithubGroupProperties memory groupProperties = abi.decode(
       claim.extraData,
-      (IdentityGroupProperties)
+      (GithubGroupProperties)
     );
 
     Attestation[] memory attestations = new Attestation[](1);
 
-    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + claim.groupId;
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + groupProperties.groupIndex;
 
     address issuer = address(this);
 
@@ -108,7 +98,7 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
       issuer,
       claim.claimedValue,
       groupProperties.generationTimestamp,
-      claim.extraData
+      ''
     );
     return (attestations);
   }
@@ -170,5 +160,25 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
     returns (address)
   {
     return _sourcesToDestinations[attestationId][source];
+  }
+
+  function _verifyAuthentication(MerkleProofData memory merkleProofData) internal {
+    if (!ATTESTATIONS_REGISTRY.hasAttestation(merkleProofData.identityAttestationId, msg.sender))
+      revert IdentityDoesNotExist();
+
+    bytes memory identityExtraData = ATTESTATIONS_REGISTRY.getAttestationExtraData(
+      merkleProofData.identityAttestationId,
+      msg.sender
+    );
+
+    IdentityGroupProperties memory identityData = abi.decode(
+      identityExtraData,
+      (IdentityGroupProperties)
+    );
+
+    if (
+      !(keccak256(abi.encodePacked(merkleProofData.accountId)) ==
+        keccak256(abi.encodePacked(identityData.accountId)))
+    ) revert IdentityInvalid();
   }
 }

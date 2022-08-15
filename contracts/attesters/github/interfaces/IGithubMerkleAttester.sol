@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.14;
+pragma experimental ABIEncoderV2;
 
-interface IIdentityAttester {
-  error SignatureDeadlineExpired(uint256 deadline);
-  error SignatureInvalid(address expectedSigner, address signer);
+interface IGithubMerkleAttester {
   error SourceAlreadyUsed(address source);
+  error GroupNotAvailable();
+  error ClaimInvalid();
+  error IdentityDoesNotExist();
+  error IdentityInvalid();
 
   event SourceToDestinationUpdated(uint256 attestationId, address source, address destination);
 

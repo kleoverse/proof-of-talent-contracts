@@ -30,6 +30,7 @@ import {
   CommitmentMapperRegistry,
   Front,
   GithubAttester,
+  GithubMerkleAttester,
   HydraS1SimpleAttester,
   HydraS1SoulboundAttester,
   HydraS1Verifier,
@@ -43,6 +44,10 @@ import {
   DeployedIdentityAttester,
   DeployIdentityAttesterArgs,
 } from '../unit/attesters/identity/deploy-identity-attester.task';
+import {
+  DeployedGithubMerkleAttester,
+  DeployGithubMerkleAttesterArgs,
+} from '../unit/attesters/github/deploy-github-merkle-attester.task';
 
 export interface Deployed0 {
   attestationsRegistry: AttestationsRegistry;
@@ -55,6 +60,7 @@ export interface Deployed0 {
   hydraS1Verifier: HydraS1Verifier;
   githubAttester: GithubAttester;
   identityAttester: IdentityAttester;
+  githubMerkleAttester: GithubMerkleAttester;
 }
 
 async function deploymentAction(
@@ -127,6 +133,19 @@ async function deploymentAction(
     'deploy-identity-attester',
     identityAttesterArgs
   )) as DeployedIdentityAttester;
+
+  const githubMerkleAttesterArgs: DeployGithubMerkleAttesterArgs = {
+    collectionIdFirst: config.githubMerkleAttester.collectionIdFirst,
+    collectionIdLast: config.githubMerkleAttester.collectionIdLast,
+    attestationsRegistryAddress: attestationsRegistry.address,
+    availableRootsRegistryAddress: availableRootsRegistry.address,
+    options,
+  };
+
+  const { githubMerkleAttester } = (await hre.run(
+    'deploy-github-merkle-attester',
+    githubMerkleAttesterArgs
+  )) as DeployedGithubMerkleAttester;
 
   const soulBoundArgs: DeployHydraS1SoulboundAttesterArgs = {
     collectionIdFirst: config.hydraS1SoulboundAttester.collectionIdFirst,
@@ -217,6 +236,19 @@ async function deploymentAction(
     attesterAddress: identityAttester.address,
     collectionIdFirst: config.identityAttester.collectionIdFirst,
     collectionIdLast: config.identityAttester.collectionIdLast,
+    options: getCommonOptions(options),
+  } as AuthorizeRangeArgs);
+
+  if (options.manualConfirm || options.log) {
+    console.log(`
+    ----------------------------------------------------------------
+    * Authorize GithubMerkleAttester to record on the AttestationsRegistry`);
+  }
+  await hre.run('attestations-registry-authorize-range', {
+    attestationsRegistryAddress: attestationsRegistry.address,
+    attesterAddress: githubMerkleAttester.address,
+    collectionIdFirst: config.githubMerkleAttester.collectionIdFirst,
+    collectionIdLast: config.githubMerkleAttester.collectionIdLast,
     options: getCommonOptions(options),
   } as AuthorizeRangeArgs);
 
@@ -331,6 +363,12 @@ async function deploymentAction(
       -> implem: ${(await hre.deployments.all()).IdentityAttester.address}
       collectionIdFirst: ${config.identityAttester.collectionIdFirst}
       collectionIdLast: ${config.identityAttester.collectionIdLast}
+
+    * GithubMerkleAttester:
+      -> proxy: ${(await hre.deployments.all()).GithubMerkleAttester.address}
+      -> implem: ${(await hre.deployments.all()).GithubMerkleAttester.address}
+      collectionIdFirst: ${config.githubMerkleAttester.collectionIdFirst}
+      collectionIdLast: ${config.githubMerkleAttester.collectionIdLast}
     
     * AvailableRootsRegistry: 
       -> proxy: ${(await hre.deployments.all()).AvailableRootsRegistry.address}
@@ -350,6 +388,7 @@ async function deploymentAction(
     hydraS1SoulboundAttester,
     githubAttester,
     identityAttester,
+    githubMerkleAttester,
     availableRootsRegistry,
     commitmentMapperRegistry,
     front,
