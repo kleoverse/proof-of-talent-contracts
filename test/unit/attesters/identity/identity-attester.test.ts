@@ -102,7 +102,7 @@ describe('Test Identity attester contract', () => {
             claimedValue: source1Value,
             extraData: encodeIdentityGroupProperties(
               group1.properties,
-              source1.account,
+              source1.identifier,
               source1.username
             ),
           },
@@ -144,7 +144,7 @@ describe('Test Identity attester contract', () => {
             claimedValue: source1Value + 1,
             extraData: encodeIdentityGroupProperties(
               group1.properties,
-              source1.account,
+              source1.identifier,
               source1.username
             ),
           },
@@ -195,7 +195,7 @@ describe('Test Identity attester contract', () => {
             claimedValue: source1Value,
             extraData: encodeIdentityGroupProperties(
               group1.properties,
-              source1.account,
+              source1.identifier,
               source1.username
             ),
           },
@@ -209,7 +209,7 @@ describe('Test Identity attester contract', () => {
             claimedValue: source1Value + 1,
             extraData: encodeIdentityGroupProperties(
               group1.properties,
-              source1.account,
+              source1.identifier,
               source1.username
             ),
           },
@@ -263,7 +263,7 @@ describe('Test Identity attester contract', () => {
             claimedValue: source1Value,
             extraData: encodeIdentityGroupProperties(
               group1.properties,
-              source1.account,
+              source1.identifier,
               source1.username
             ),
           },
@@ -297,7 +297,7 @@ describe('Test Identity attester contract', () => {
             claimedValue: source1Value,
             extraData: encodeIdentityGroupProperties(
               group1.properties,
-              source1.account,
+              source1.identifier,
               source1.username
             ),
           },
@@ -344,7 +344,7 @@ describe('Test Identity attester contract', () => {
             claimedValue: source1Value,
             extraData: encodeIdentityGroupProperties(
               group1.properties,
-              source1.account,
+              source1.identifier,
               source1.username
             ),
           },

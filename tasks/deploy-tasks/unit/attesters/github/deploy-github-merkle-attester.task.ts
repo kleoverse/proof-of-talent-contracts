@@ -10,44 +10,41 @@ import {
   DeployOptions,
 } from '../../../utils';
 
-import { GithubAttester, GithubAttester__factory } from '../../../../../types';
+import { GithubMerkleAttester, GithubMerkleAttester__factory } from '../../../../../types';
 import { BigNumber, BigNumberish } from 'ethers';
 
-export interface DeployGithubAttesterArgs {
-  // address of the attestations contract,
-  // which is part of the SAS
-  // Sismo Attestation State
+export interface DeployGithubMerkleAttesterArgs {
   attestationsRegistryAddress: string;
+  availableRootsRegistryAddress: string;
   collectionIdFirst: BigNumberish;
   collectionIdLast: BigNumberish;
-  verifierAddress: string;
   options?: DeployOptions;
 }
 
-export interface DeployedGithubAttester {
-  githubAttester: GithubAttester;
+export interface DeployedGithubMerkleAttester {
+  githubMerkleAttester: GithubMerkleAttester;
 }
 
-const CONTRACT_NAME = 'GithubAttester';
+const CONTRACT_NAME = 'GithubMerkleAttester';
 
 async function deploymentAction(
   {
     attestationsRegistryAddress,
+    availableRootsRegistryAddress,
     collectionIdFirst = 100,
     collectionIdLast = 0,
-    verifierAddress,
     options,
-  }: DeployGithubAttesterArgs,
+  }: DeployGithubMerkleAttesterArgs,
   hre: HardhatRuntimeEnvironment
-): Promise<DeployedGithubAttester> {
+): Promise<DeployedGithubMerkleAttester> {
   const deployer = await getDeployer(hre);
   const deploymentName = buildDeploymentName(CONTRACT_NAME, options?.deploymentNamePrefix);
 
   const deploymentArgs = [
     attestationsRegistryAddress,
+    availableRootsRegistryAddress,
     BigNumber.from(collectionIdFirst),
     BigNumber.from(collectionIdLast),
-    verifierAddress,
   ];
 
   await beforeDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, options);
@@ -69,13 +66,13 @@ async function deploymentAction(
 
   await afterDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, deployed, options);
 
-  const githubAttester = GithubAttester__factory.connect(deployed.address, deployer);
-  return { githubAttester };
+  const githubMerkleAttester = GithubMerkleAttester__factory.connect(deployed.address, deployer);
+  return { githubMerkleAttester };
 }
 
-task('deploy-github-attester')
+task('deploy-github-merkle-attester')
   .addParam('collectionIdFirst', '')
   .addParam('collectionIdLast', '')
   .addParam('attestationsRegistryAddress', 'Address of the attestations contract')
-  .addParam('verifierAddress', 'Address of the verifier')
+  .addParam('availableRootsRegistryAddress', 'address of the registryMerkleRoot contract')
   .setAction(wrapCommonDeployOptions(deploymentAction));

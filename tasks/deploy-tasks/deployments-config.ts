@@ -66,6 +66,10 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdLast: '500000',
       verifierAddress: ALPHA_POLYGON_VERIFIER,
     },
+    githubMerkleAttester: {
+      collectionIdFirst: '500001',
+      collectionIdLast: '600000',
+    },
     attestationsRegistry: {
       owner: ALPHA_POLYGON_OWNER,
     },
@@ -117,6 +121,10 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdLast: '500000',
       verifierAddress: ALPHA_RINKEBY_VERIFIER,
     },
+    githubMerkleAttester: {
+      collectionIdFirst: '500001',
+      collectionIdLast: '600000',
+    },
     attestationsRegistry: {
       owner: ALPHA_RINKEBY_OWNER,
     },
@@ -167,6 +175,10 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdLast: '500000',
       verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
     },
+    githubMerkleAttester: {
+      collectionIdFirst: '500001',
+      collectionIdLast: '600000',
+    },
     attestationsRegistry: {
       owner: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
     },
@@ -216,6 +228,10 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '400001',
       collectionIdLast: '500000',
       verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
+    },
+    githubMerkleAttester: {
+      collectionIdFirst: '500001',
+      collectionIdLast: '600000',
     },
     attestationsRegistry: {
       owner: '0xb01ee322c4f028b8a6bfcd2a5d48107dc5bc99ec',

@@ -38,8 +38,8 @@ export const generateIdentityLists = (Accounts: IdentityAccountData[]): Identity
   const List1 = {};
   const List2 = {};
   Accounts.forEach((account, index) => {
-    Object.assign(List1, { [account.identifier]: index + 1 });
-    Object.assign(List2, { [account.identifier]: index + 1 });
+    Object.assign(List1, { [account.identifier]: 1 });
+    Object.assign(List2, { [account.identifier]: 1 });
   });
   return [List1, List2];
 };
@@ -94,13 +94,15 @@ export const encodeIdentityGroupProperties = (
   username: string
 ): string => {
   return ethers.utils.defaultAbiCoder.encode(
-    ['uint128', 'uint32', 'string', 'string', 'string'],
+    ['tuple(uint128,uint32,string,string,string)'],
     [
-      groupProperties.groupIndex,
-      groupProperties.generationTimestamp,
-      groupProperties.identityType,
-      accountId,
-      username,
+      [
+        groupProperties.groupIndex,
+        groupProperties.generationTimestamp,
+        groupProperties.identityType,
+        accountId,
+        username,
+      ],
     ]
   );
 };
