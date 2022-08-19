@@ -70,6 +70,13 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
     },
+    skillAttester: {
+      collectionIdFirst: '600001',
+      collectionIdLast: '700000',
+    },
+    skillBadge: {
+      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+    },
     attestationsRegistry: {
       owner: ALPHA_POLYGON_OWNER,
     },
@@ -125,6 +132,13 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
     },
+    skillAttester: {
+      collectionIdFirst: '600001',
+      collectionIdLast: '700000',
+    },
+    skillBadge: {
+      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+    },
     attestationsRegistry: {
       owner: ALPHA_RINKEBY_OWNER,
     },
@@ -179,6 +193,13 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
     },
+    skillAttester: {
+      collectionIdFirst: '600001',
+      collectionIdLast: '700000',
+    },
+    skillBadge: {
+      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+    },
     attestationsRegistry: {
       owner: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
     },
@@ -232,6 +253,13 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
     githubMerkleAttester: {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
+    },
+    skillAttester: {
+      collectionIdFirst: '600001',
+      collectionIdLast: '700000',
+    },
+    skillBadge: {
+      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
     },
     attestationsRegistry: {
       owner: '0xb01ee322c4f028b8a6bfcd2a5d48107dc5bc99ec',

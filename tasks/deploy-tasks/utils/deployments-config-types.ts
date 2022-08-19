@@ -41,6 +41,13 @@ export type DeploymentsConfigTypes = {
       collectionIdFirst: string;
       collectionIdLast: string;
     };
+    skillAttester: {
+      collectionIdFirst: string;
+      collectionIdLast: string;
+    };
+    skillBadge: {
+      uri: string;
+    };
     // Conf related to the commitment mapper
     // https://github.com/sismo-core/sismo-commitment-mapper
     commitmentMapper: {
