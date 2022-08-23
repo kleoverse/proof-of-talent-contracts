@@ -7,3 +7,4 @@ export * from './github';
 export * from './identity';
 export * from './eip712';
 export * from './githubMerkle';
+export * from './skill';

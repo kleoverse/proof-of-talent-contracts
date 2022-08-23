@@ -35,6 +35,8 @@ import {
   HydraS1SoulboundAttester,
   HydraS1Verifier,
   IdentityAttester,
+  SkillAttester,
+  SkillBadge,
 } from 'types';
 import {
   DeployedGithubAttester,
@@ -48,6 +50,14 @@ import {
   DeployedGithubMerkleAttester,
   DeployGithubMerkleAttesterArgs,
 } from '../unit/attesters/github/deploy-github-merkle-attester.task';
+import {
+  DeployedSkillAttester,
+  DeploySkillAttesterArgs,
+} from '../unit/attesters/skill/deploy-skill-attester.task';
+import {
+  DeployedSkillBadge,
+  DeploySkillBadgeArgs,
+} from '../unit/periphery/badges/deploy-skill-badge.task';
 
 export interface Deployed0 {
   attestationsRegistry: AttestationsRegistry;
@@ -61,6 +71,8 @@ export interface Deployed0 {
   githubAttester: GithubAttester;
   identityAttester: IdentityAttester;
   githubMerkleAttester: GithubMerkleAttester;
+  skillAttester: SkillAttester;
+  skillBadge: SkillBadge;
 }
 
 async function deploymentAction(
@@ -93,6 +105,12 @@ async function deploymentAction(
     commitmentMapperPubKeyY: config.commitmentMapper.EdDSAPubKeyY,
     options,
   } as DeployCommitmentMapperArgs)) as DeployedCommitmentMapper;
+
+  const { skillBadge } = (await hre.run('deploy-skill-badge', {
+    attestationsRegistryAddress: attestationsRegistry.address,
+    uri: config.skillBadge.uri,
+    options,
+  } as DeploySkillBadgeArgs)) as DeployedSkillBadge;
 
   const hydraS1SimpleArgs: DeployHydraS1SimpleAttesterArgs = {
     collectionIdFirst: config.hydraS1SimpleAttester.collectionIdFirst,
@@ -146,6 +164,19 @@ async function deploymentAction(
     'deploy-github-merkle-attester',
     githubMerkleAttesterArgs
   )) as DeployedGithubMerkleAttester;
+
+  const skillAttesterArgs: DeploySkillAttesterArgs = {
+    collectionIdFirst: config.skillAttester.collectionIdFirst,
+    collectionIdLast: config.skillAttester.collectionIdLast,
+    attestationsRegistryAddress: attestationsRegistry.address,
+    skillBadgeAddress: skillBadge.address,
+    options,
+  };
+
+  const { skillAttester } = (await hre.run(
+    'deploy-skill-attester',
+    skillAttesterArgs
+  )) as DeployedSkillAttester;
 
   const soulBoundArgs: DeployHydraS1SoulboundAttesterArgs = {
     collectionIdFirst: config.hydraS1SoulboundAttester.collectionIdFirst,
@@ -252,6 +283,19 @@ async function deploymentAction(
     options: getCommonOptions(options),
   } as AuthorizeRangeArgs);
 
+  if (options.manualConfirm || options.log) {
+    console.log(`
+    ----------------------------------------------------------------
+    * Authorize SkillAttester to record on the AttestationsRegistry`);
+  }
+  await hre.run('attestations-registry-authorize-range', {
+    attestationsRegistryAddress: attestationsRegistry.address,
+    attesterAddress: skillAttester.address,
+    collectionIdFirst: config.skillAttester.collectionIdFirst,
+    collectionIdLast: config.skillAttester.collectionIdLast,
+    options: getCommonOptions(options),
+  } as AuthorizeRangeArgs);
+
   // ----------  SET FINAL OWNERSHIP -------------
   if (options.manualConfirm || options.log) {
     console.log(`
@@ -336,6 +380,11 @@ async function deploymentAction(
       -> proxy: ${(await hre.deployments.all()).Badges.address}
       -> implem: ${(await hre.deployments.all()).BadgesImplem.address}
       uri: ${config.badges.uri}
+    
+    * Skill Badge
+      -> proxy: ${(await hre.deployments.all()).SkillBadge.address}
+      -> implem: ${(await hre.deployments.all()).SkillBadge.address}
+      uri: ${config.skillBadge.uri}
 
     * HydraS1SimpleAttester:
       -> proxy: ${(await hre.deployments.all()).HydraS1SimpleAttester.address}
@@ -369,6 +418,12 @@ async function deploymentAction(
       -> implem: ${(await hre.deployments.all()).GithubMerkleAttester.address}
       collectionIdFirst: ${config.githubMerkleAttester.collectionIdFirst}
       collectionIdLast: ${config.githubMerkleAttester.collectionIdLast}
+
+    * SkillAttester:
+      -> proxy: ${(await hre.deployments.all()).SkillAttester.address}
+      -> implem: ${(await hre.deployments.all()).SkillAttester.address}
+      collectionIdFirst: ${config.skillAttester.collectionIdFirst}
+      collectionIdLast: ${config.skillAttester.collectionIdLast}
     
     * AvailableRootsRegistry: 
       -> proxy: ${(await hre.deployments.all()).AvailableRootsRegistry.address}
@@ -389,12 +444,14 @@ async function deploymentAction(
     githubAttester,
     identityAttester,
     githubMerkleAttester,
+    skillAttester,
     availableRootsRegistry,
     commitmentMapperRegistry,
     front,
     badges,
     attestationsRegistry,
     hydraS1Verifier,
+    skillBadge,
   };
 }
 
