@@ -67,11 +67,15 @@ describe('Test Skill Badge contract', () => {
   });
 
   /*************************************************************************************/
-  /********************************** Get Skill balance ***********************************/
+  /********************************** Get Skill data ***********************************/
   /*************************************************************************************/
-  describe('Skill balance getter', () => {
+  describe('Skill data getter', () => {
     it('should get skill balance', async () => {
       expect(await skillBadge.balanceOf(user.address, 0)).to.equal(30);
+    });
+
+    it('should get credIds of skill', async () => {
+      expect(await skillBadge.getSkillToCreds(0)).to.deep.equal([1, 2]);
     });
   });
 });
