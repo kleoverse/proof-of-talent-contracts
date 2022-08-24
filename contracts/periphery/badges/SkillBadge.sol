@@ -50,4 +50,8 @@ contract SkillBadge is ERC1155, Ownable {
   function getSkillToCredWeight(uint256 id, uint256 credId) public view returns (uint32) {
     return skills[id].credsToWeights[credId];
   }
+
+  function getSkillToCreds(uint256 id) public view returns (uint256[] memory) {
+    return skills[id].credIds;
+  }
 }
