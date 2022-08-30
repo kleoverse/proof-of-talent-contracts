@@ -96,6 +96,7 @@ const config: HardhatUserConfig = {
     main: getCommonNetworkConfig(EthereumNetwork.main, 1),
     polygon: getCommonNetworkConfig(PolygonNetwork.main, 137),
     rinkeby: getCommonNetworkConfig(EthereumNetwork.rinkeby, 4),
+    goerli: getCommonNetworkConfig(EthereumNetwork.goerli, 5),
     mumbai: getCommonNetworkConfig(PolygonNetwork.mumbai, 80001),
     xdai: getCommonNetworkConfig(XDaiNetwork.xdai, 100),
     local: {
