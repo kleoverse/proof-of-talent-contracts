@@ -107,7 +107,6 @@ async function deploymentAction(
   } as DeployCommitmentMapperArgs)) as DeployedCommitmentMapper;
 
   const { skillBadge } = (await hre.run('deploy-skill-badge', {
-    attestationsRegistryAddress: attestationsRegistry.address,
     uri: config.skillBadge.uri,
     options,
   } as DeploySkillBadgeArgs)) as DeployedSkillBadge;
