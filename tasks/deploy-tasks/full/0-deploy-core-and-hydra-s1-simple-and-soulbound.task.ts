@@ -344,17 +344,17 @@ async function deploymentAction(
     accountAddress: config.badges.owner,
     options: getCommonOptions(options),
   } as AccessControlGrantRoleArgs);
-  if (options.manualConfirm || options.log) {
-    console.log(`
-    ----------------------------------------------------------------
-    * Revoking role DEFAULT_ADMIN_ROLE of the deployer to th Badges contract`);
-  }
-  await hre.run('access-control-revoke-role', {
-    contractAddress: badges.address,
-    role: await badges.DEFAULT_ADMIN_ROLE(),
-    accountAddress: deployer.address,
-    options: getCommonOptions(options),
-  } as AccessControlGrantRoleArgs);
+  // if (options.manualConfirm || options.log) {
+  //   console.log(`
+  //   ----------------------------------------------------------------
+  //   * Revoking role DEFAULT_ADMIN_ROLE of the deployer to th Badges contract`);
+  // }
+  // await hre.run('access-control-revoke-role', {
+  //   contractAddress: badges.address,
+  //   role: await badges.DEFAULT_ADMIN_ROLE(),
+  //   accountAddress: deployer.address,
+  //   options: getCommonOptions(options),
+  // } as AccessControlGrantRoleArgs);
 
   if (options.manualConfirm || options.log) {
     console.log(`

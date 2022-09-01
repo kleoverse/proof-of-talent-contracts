@@ -53,14 +53,15 @@ const mainnetFork =
 
 const getCommonNetworkConfig = (networkName: string, networkId: number) => ({
   url: NETWORKS_RPC_URL[networkName] ?? '',
-  hardfork: HARDFORK,
+  // hardfork: HARDFORK,
   chainId: networkId,
-  accounts: {
-    mnemonic: MNEMONIC,
-    path: MNEMONIC_PATH,
-    initialIndex: 0,
-    count: 20,
-  },
+  accounts: [process.env.RINKEBY_PRIVATE_KEY!]
+  // accounts: {
+  //   mnemonic: MNEMONIC,
+  //   path: MNEMONIC_PATH,
+  //   initialIndex: 0,
+  //   count: 20,
+  // },
 });
 
 const accounts = Array.from(Array(20), (_, index) => {
@@ -96,6 +97,7 @@ const config: HardhatUserConfig = {
     main: getCommonNetworkConfig(EthereumNetwork.main, 1),
     polygon: getCommonNetworkConfig(PolygonNetwork.main, 137),
     rinkeby: getCommonNetworkConfig(EthereumNetwork.rinkeby, 4),
+    goerli: getCommonNetworkConfig(EthereumNetwork.goerli, 5),
     mumbai: getCommonNetworkConfig(PolygonNetwork.mumbai, 80001),
     xdai: getCommonNetworkConfig(XDaiNetwork.xdai, 100),
     local: {

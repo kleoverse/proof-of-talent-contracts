@@ -10,6 +10,7 @@ export enum EthereumNetwork {
   hardhat = 'hardhat',
   tenderlyMain = 'tenderlyMain',
   harhatevm = 'harhatevm',
+  goerli = 'goerli'
 }
 
 export enum PolygonNetwork {
@@ -32,6 +33,7 @@ export interface EthereumParamsPerNetwork<Network> {
   [EthereumNetwork.main]: Network;
   [EthereumNetwork.hardhat]: Network;
   [EthereumNetwork.tenderlyMain]: Network;
+  [EthereumNetwork.goerli]: Network;
 }
 
 export interface PolygonParamsPerNetwork<T> {
@@ -70,4 +72,8 @@ export const NETWORKS_RPC_URL: ParamsPerNetwork<string> = {
     process.env.POLYGON_RPC_URL
   ),
   [XDaiNetwork.xdai]: 'https://rpc.xdaichain.com/',
+  [EthereumNetwork.goerli]: alchemyUrlOrEnvVar(
+    'https://eth-goerli.alchemyapi.io/v2',
+    process.env.GOERLI_RPC_URL
+  ),
 };

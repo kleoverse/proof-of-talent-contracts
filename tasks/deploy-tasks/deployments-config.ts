@@ -18,15 +18,15 @@ const COMMITMENT_MAPPER_TESTER = [
 
 const THREE_DAYS = '295200';
 // Rinkeby
-const ALPHA_RINKEBY_OWNER = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
-const ALPHA_RINKEBY_ROOTS_OWNER_RELAYER = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
-const ALPHA_RINKEBY_PROXY_ADMIN = '0x98941094d282ddA631031283EA70ec9e81246638';
-const ALPHA_RINKEBY_VERIFIER = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
+const ALPHA_RINKEBY_OWNER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
+const ALPHA_RINKEBY_ROOTS_OWNER_RELAYER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
+const ALPHA_RINKEBY_PROXY_ADMIN = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
+const ALPHA_RINKEBY_VERIFIER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
 // Polygon
 const ALPHA_POLYGON_OWNER = '0xaee4acd5c4Bf516330ca8fe11B07206fC6709294';
 const ALPHA_POLYGON_ROOTS_OWNER_RELAYER = '0xf0a0b692e1c764281c211948d03edeef5fb57111';
 const ALPHA_POLYGON_PROXY_ADMIN = '0x2110475dfbB8d331b300178A867372991ff35fA3';
-const ALPHA_POLYGON_VERIFIER = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
+const ALPHA_POLYGON_VERIFIER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
 
 export const deploymentsConfig: DeploymentsConfigTypes = {
   polygon: {
@@ -101,7 +101,67 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
     badges: {
       owner: ALPHA_RINKEBY_OWNER,
       // Badges Metadata URI for the Badges contract
-      uri: 'https://metadata.badges.zikies.io/badges/rinkeby/{id}.json',
+      uri: 'https://xdnaanuupvzzrktjiamg.supabase.co/storage/v1/object/public/badges/metadata/{id}.json',
+    },
+    front: {
+      collectionIdFirst: '0',
+      collectionIdLast: '10000000',
+    },
+    hydraS1SimpleAttester: {
+      collectionIdFirst: '10000001',
+      collectionIdLast: '20000000',
+      initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
+    },
+    hydraS1SoulboundAttester: {
+      collectionIdFirst: '20000001',
+      collectionIdLast: '30000000',
+      soulboundCooldownDuration: THREE_DAYS, // 3 days
+      initialRoot: '0',
+    },
+    githubAttester: {
+      collectionIdFirst: '300001',
+      collectionIdLast: '400000',
+      verifierAddress: ALPHA_RINKEBY_VERIFIER,
+    },
+    identityAttester: {
+      collectionIdFirst: '400001',
+      collectionIdLast: '500000',
+      verifierAddress: ALPHA_RINKEBY_VERIFIER,
+    },
+    githubMerkleAttester: {
+      collectionIdFirst: '500001',
+      collectionIdLast: '600000',
+    },
+    skillAttester: {
+      collectionIdFirst: '600001',
+      collectionIdLast: '700000',
+    },
+    skillBadge: {
+      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+    },
+    attestationsRegistry: {
+      owner: ALPHA_RINKEBY_OWNER,
+    },
+    availableRootsRegistry: {
+      owner: ALPHA_RINKEBY_ROOTS_OWNER_RELAYER,
+    },
+    commitmentMapper: {
+      owner: ALPHA_RINKEBY_OWNER,
+      EdDSAPubKeyX: COMMITMENT_MAPPER_EDDSA_PUB_KEY_STAGING[0],
+      EdDSAPubKeyY: COMMITMENT_MAPPER_EDDSA_PUB_KEY_STAGING[1],
+    },
+  },
+  goerli: {
+    deployOptions: {
+      manualConfirm: false,
+      log: true,
+      behindProxy: true,
+      proxyAdmin: ALPHA_RINKEBY_PROXY_ADMIN,
+    },
+    badges: {
+      owner: ALPHA_RINKEBY_OWNER,
+      // Badges Metadata URI for the Badges contract
+      uri: 'https://xdnaanuupvzzrktjiamg.supabase.co/storage/v1/object/public/badges/metadata/{id}.json',
     },
     front: {
       collectionIdFirst: '0',
