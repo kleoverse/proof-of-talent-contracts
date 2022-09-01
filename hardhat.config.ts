@@ -53,14 +53,15 @@ const mainnetFork =
 
 const getCommonNetworkConfig = (networkName: string, networkId: number) => ({
   url: NETWORKS_RPC_URL[networkName] ?? '',
-  hardfork: HARDFORK,
+  // hardfork: HARDFORK,
   chainId: networkId,
-  accounts: {
-    mnemonic: MNEMONIC,
-    path: MNEMONIC_PATH,
-    initialIndex: 0,
-    count: 20,
-  },
+  accounts: [process.env.RINKEBY_PRIVATE_KEY!]
+  // accounts: {
+  //   mnemonic: MNEMONIC,
+  //   path: MNEMONIC_PATH,
+  //   initialIndex: 0,
+  //   count: 20,
+  // },
 });
 
 const accounts = Array.from(Array(20), (_, index) => {
