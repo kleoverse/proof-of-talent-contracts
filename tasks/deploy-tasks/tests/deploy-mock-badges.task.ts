@@ -1,61 +1,55 @@
+import { BigNumberish } from 'ethers';
 import { task } from 'hardhat/config';
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import {
-  getDeployer,
-  beforeDeployment,
   afterDeployment,
+  beforeDeployment,
   buildDeploymentName,
   customDeployContract,
-  wrapCommonDeployOptions,
   DeployOptions,
-} from '../../../utils';
+  getDeployer,
+  wrapCommonDeployOptions,
+} from '../../../tasks/deploy-tasks/utils';
+import { MockBadges, MockBadges__factory } from '../../../types';
 
-import { SkillBadge, SkillBadge__factory } from '../../../../../types';
-import { BigNumber, BigNumberish } from 'ethers';
-
-export interface DeploySkillBadgeArgs {
+export interface DeployMockBadgesArgs {
   uri: string;
+  skillPoints: BigNumberish;
   options?: DeployOptions;
 }
 
-export interface DeployedSkillBadge {
-  skillBadge: SkillBadge;
+export interface DeployedMockBadges {
+  mockBadges: MockBadges;
 }
 
-const CONTRACT_NAME = 'SkillBadge';
+const CONTRACT_NAME = 'MockBadges';
 
 async function deploymentAction(
-  { uri, options }: DeploySkillBadgeArgs,
+  { uri, skillPoints, options }: DeployMockBadgesArgs,
   hre: HardhatRuntimeEnvironment
-): Promise<DeployedSkillBadge> {
+): Promise<DeployedMockBadges> {
   const deployer = await getDeployer(hre);
+
   const deploymentName = buildDeploymentName(CONTRACT_NAME, options?.deploymentNamePrefix);
 
-  const deploymentArgs = [uri];
+  const deploymentArgs = [uri, skillPoints || 0];
 
   await beforeDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, options);
 
-  const initData = '0x';
-
-  if (options?.behindProxy) options.behindProxy = false;
   const deployed = await customDeployContract(
     hre,
     deployer,
     deploymentName,
     CONTRACT_NAME,
     deploymentArgs,
-    {
-      ...options,
-      proxyData: initData,
-    }
+    options
   );
 
   await afterDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, deployed, options);
-
-  const skillBadge = SkillBadge__factory.connect(deployed.address, deployer);
-  return { skillBadge };
+  const mockBadges = MockBadges__factory.connect(deployed.address, deployer);
+  return { mockBadges };
 }
 
-task('deploy-skill-badge')
-  .addParam('uri', 'Uri for the metadata')
+task('deploy-mock-badges')
+  .addOptionalParam('uri', 'uri for the metadata')
   .setAction(wrapCommonDeployOptions(deploymentAction));
