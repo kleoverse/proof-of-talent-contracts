@@ -55,7 +55,7 @@ describe('Test AvailableRootsRegistry contract', () => {
     it('Should revert when the attester address is a zero address', async () => {
       await expect(
         availableRootsRegistry.registerRootForAttester(ethers.constants.AddressZero, 1)
-      ).to.be.revertedWith('CannotRegisterForZeroAddress()');
+      ).to.be.revertedWithCustomError(availableRootsRegistry, 'CannotRegisterForZeroAddress');
     });
 
     it('Should register the root for the attester', async () => {
@@ -88,7 +88,7 @@ describe('Test AvailableRootsRegistry contract', () => {
     it('Should revert when the attester address is a zero address', async () => {
       await expect(
         availableRootsRegistry.unregisterRootForAttester(ethers.constants.AddressZero, 1)
-      ).to.be.revertedWith('CannotUnregisterForZeroAddress()');
+      ).to.be.revertedWithCustomError(availableRootsRegistry, 'CannotUnregisterForZeroAddress');
     });
 
     it('Should unregister the root for the attester', async () => {

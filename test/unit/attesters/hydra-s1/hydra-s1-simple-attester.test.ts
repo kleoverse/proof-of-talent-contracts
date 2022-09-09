@@ -198,13 +198,9 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
         isStrict: false,
       });
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(request, wrongProof.toBytes())
-      ).to.be.revertedWith(
-        `AccountsTreeValueMismatch(${BigNumber.from(group1.id).toString()}, ${BigNumber.from(
-          group2.id
-        ).toString()})`
-      );
+      await expect(hydraS1SimpleAttester.generateAttestations(request, wrongProof.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `AccountsTreeValueMismatch`)
+        .withArgs(BigNumber.from(group1.id).toString(), BigNumber.from(group2.id).toString());
     });
 
     it('Should revert due wrong request: user provided wrong group index property', async () => {
@@ -214,13 +210,12 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
       wrongGroupProperties.groupIndex = group2.properties.groupIndex;
       const wrongEncodedProperties = encodeGroupProperties(wrongGroupProperties);
       wrongRequest.claims[0].extraData = wrongEncodedProperties;
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(wrongRequest, proof.toBytes())
-      ).to.be.revertedWith(
-        `GroupIdAndPropertiesMismatch(${BigNumber.from(
-          generateGroupIdFromEncodedProperties(wrongEncodedProperties)
-        ).toString()}, ${BigNumber.from(group1.id)})`
-      );
+      await expect(hydraS1SimpleAttester.generateAttestations(wrongRequest, proof.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `GroupIdAndPropertiesMismatch`)
+        .withArgs(
+          BigNumber.from(generateGroupIdFromEncodedProperties(wrongEncodedProperties)).toString(),
+          BigNumber.from(group1.id)
+        );
     });
 
     it('Should revert due wrong request: user provided wrong generation timestamp property', async () => {
@@ -230,13 +225,12 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
       wrongGroupProperties.generationTimestamp = group2.properties.generationTimestamp;
       const wrongEncodedProperties = encodeGroupProperties(wrongGroupProperties);
       wrongRequest.claims[0].extraData = wrongEncodedProperties;
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(wrongRequest, proof.toBytes())
-      ).to.be.revertedWith(
-        `GroupIdAndPropertiesMismatch(${BigNumber.from(
-          generateGroupIdFromEncodedProperties(wrongEncodedProperties)
-        ).toString()}, ${BigNumber.from(group1.id)})`
-      );
+      await expect(hydraS1SimpleAttester.generateAttestations(wrongRequest, proof.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `GroupIdAndPropertiesMismatch`)
+        .withArgs(
+          BigNumber.from(generateGroupIdFromEncodedProperties(wrongEncodedProperties)).toString(),
+          BigNumber.from(group1.id)
+        );
     });
 
     it('Should revert due wrong request: user provided wrong isScore property', async () => {
@@ -246,13 +240,12 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
       wrongGroupProperties.isScore = !group1.properties.isScore;
       const wrongEncodedProperties = encodeGroupProperties(wrongGroupProperties);
       wrongRequest.claims[0].extraData = wrongEncodedProperties;
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(wrongRequest, proof.toBytes())
-      ).to.be.revertedWith(
-        `GroupIdAndPropertiesMismatch(${BigNumber.from(
-          generateGroupIdFromEncodedProperties(wrongEncodedProperties)
-        ).toString()}, ${BigNumber.from(group1.id)})`
-      );
+      await expect(hydraS1SimpleAttester.generateAttestations(wrongRequest, proof.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `GroupIdAndPropertiesMismatch`)
+        .withArgs(
+          BigNumber.from(generateGroupIdFromEncodedProperties(wrongEncodedProperties)).toString(),
+          BigNumber.from(group1.id)
+        );
     });
 
     it('Should revert due wrong request: groupId does not correspond to provided properties in extraData', async () => {
@@ -260,11 +253,9 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
       const wrongGroupId = generateGroupIdFromProperties({ ...group2.properties });
       wrongRequest.claims[0].groupId = wrongGroupId;
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(wrongRequest, proof.toBytes())
-      ).to.be.revertedWith(
-        `GroupIdAndPropertiesMismatch(${BigNumber.from(group1.id).toString()}, ${wrongGroupId})`
-      );
+      await expect(hydraS1SimpleAttester.generateAttestations(wrongRequest, proof.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `GroupIdAndPropertiesMismatch`)
+        .withArgs(BigNumber.from(group1.id).toString(), wrongGroupId);
     });
 
     it('Should revert due to input proof destination not the same as destination', async () => {
@@ -278,13 +269,12 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
         isStrict: !group1.properties.isScore,
       });
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(request, wrongProof.toBytes())
-      ).to.be.revertedWith(
-        `DestinationMismatch("${BigNumber.from(
-          destination1.identifier
-        ).toHexString()}", "${BigNumber.from(destination2.identifier).toHexString()}")`
-      );
+      await expect(hydraS1SimpleAttester.generateAttestations(request, wrongProof.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `DestinationMismatch`)
+        .withArgs(
+          BigNumber.from(destination1.identifier).toHexString(),
+          BigNumber.from(destination2.identifier).toHexString()
+        );
     });
 
     it('Should revert due to chain id mismatch', async () => {
@@ -292,18 +282,18 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
       wrongProof.input[1] = BigNumber.from(123);
       const proofBytes = toBytes(wrongProof);
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(request, proofBytes)
-      ).to.be.revertedWith(`ChainIdMismatch(${parseInt(await hre.getChainId())}, 123)`);
+      await expect(hydraS1SimpleAttester.generateAttestations(request, proofBytes))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `ChainIdMismatch`)
+        .withArgs(parseInt(await hre.getChainId()), 123);
     });
 
     it('Should revert due to input value not the same as claimValue', async () => {
       const requestWrong = { ...request, claims: [{ ...request.claims[0] }] };
       const wrongClaimValue = 1000;
       requestWrong.claims[0].claimedValue = wrongClaimValue;
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(requestWrong, proof.toBytes())
-      ).to.be.revertedWith(`ValueMismatch(${wrongClaimValue}, ${request.claims[0].claimedValue})`);
+      await expect(hydraS1SimpleAttester.generateAttestations(requestWrong, proof.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `ValueMismatch`)
+        .withArgs(wrongClaimValue, request.claims[0].claimedValue);
     });
 
     it('Should revert due to registry roots mismatch', async () => {
@@ -311,9 +301,9 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
       wrongProof.input[4] = BigNumber.from(123);
       const proofBytes = toBytes(wrongProof);
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(request, proofBytes)
-      ).to.be.revertedWith(`RegistryRootMismatch(123)`);
+      await expect(hydraS1SimpleAttester.generateAttestations(request, proofBytes))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `RegistryRootMismatch`)
+        .withArgs(123);
     });
 
     it('Should revert due to commitment mapper public key mismatch', async () => {
@@ -322,13 +312,14 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
       wrongProof.input[2] = BigNumber.from(123);
       const proofBytes = toBytes(wrongProof);
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(request, proofBytes)
-      ).to.be.revertedWith(
-        `CommitmentMapperPubKeyMismatch(${commitmentMapperPubKey[0].toString()}, ${commitmentMapperPubKey[1].toString()}, 123, ${
+      await expect(hydraS1SimpleAttester.generateAttestations(request, proofBytes))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `CommitmentMapperPubKeyMismatch`)
+        .withArgs(
+          commitmentMapperPubKey[0].toString(),
+          commitmentMapperPubKey[1].toString(),
+          123,
           wrongProof.input[3]
-        })`
-      );
+        );
     });
 
     it('Should revert due to wrong ticket identifier', async () => {
@@ -344,11 +335,9 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
         isStrict: !group1.properties.isScore,
       });
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(request, proof2.toBytes())
-      ).to.be.revertedWith(
-        `TicketIdentifierMismatch(${ticketIdentifier}, ${wrongTicketIdentifier})`
-      );
+      await expect(hydraS1SimpleAttester.generateAttestations(request, proof2.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `TicketIdentifierMismatch`)
+        .withArgs(ticketIdentifier, wrongTicketIdentifier);
     });
 
     /****************************************/
@@ -362,9 +351,9 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
 
       const proofBytes = toBytes(wrongProof);
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(request, proofBytes)
-      ).to.be.revertedWith(`InvalidGroth16Proof("verifier-gte-snark-scalar-field")`);
+      await expect(hydraS1SimpleAttester.generateAttestations(request, proofBytes))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `InvalidGroth16Proof`)
+        .withArgs('verifier-gte-snark-scalar-field');
     });
     it('Should revert if wrong snark proof', async () => {
       // override the ticket proof to overflow
@@ -373,9 +362,9 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
 
       const proofBytes = toBytes(wrongProof);
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(request, proofBytes)
-      ).to.be.revertedWith(`InvalidGroth16Proof("")`);
+      await expect(hydraS1SimpleAttester.generateAttestations(request, proofBytes))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `InvalidGroth16Proof`)
+        .withArgs('');
     });
   });
 
@@ -398,9 +387,9 @@ describe('Test Hydra S1 standard attester contract, not strict', () => {
         isStrict: !group1.properties.isScore,
       });
 
-      await expect(
-        hydraS1SimpleAttester.generateAttestations(wrongRequest, proof2.toBytes())
-      ).to.be.revertedWith(`TicketUsed(${proof.input[6]})`);
+      await expect(hydraS1SimpleAttester.generateAttestations(wrongRequest, proof2.toBytes()))
+        .to.be.revertedWithCustomError(hydraS1SimpleAttester, `TicketUsed`)
+        .withArgs(proof.input[6]);
     });
   });
 });

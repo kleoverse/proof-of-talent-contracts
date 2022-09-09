@@ -132,9 +132,9 @@ describe('Test Attestations Registry Config Logic contract', () => {
             authorizedRange.min,
             authorizedRange.max
           )
-        ).to.be.revertedWith(
-          `RangeIndexOutOfBounds("${issuer.address}", 1, ${unauthorizedRangeIndex})`
-        );
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `RangeIndexOutOfBounds`)
+          .withArgs(issuer.address, 1, unauthorizedRangeIndex);
       });
 
       it('Should revert when the firstCollectionId mismatch the collection min', async () => {
@@ -145,11 +145,16 @@ describe('Test Attestations Registry Config Logic contract', () => {
             authorizedRange.min - 1,
             authorizedRange.max
           )
-        ).to.be.revertedWith(
-          `IdsMismatch("${issuer.address}", ${authorizedRangeIndex}, ${authorizedRange.min}, ${
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `IdsMismatch`)
+          .withArgs(
+            issuer.address,
+            authorizedRangeIndex,
+            authorizedRange.min,
+            authorizedRange.max,
+            authorizedRange.min - 1,
             authorizedRange.max
-          }, ${authorizedRange.min - 1}, ${authorizedRange.max})`
-        );
+          );
       });
 
       it('Should revert when the lastCollectionId mistmatch the collection max', async () => {
@@ -160,11 +165,16 @@ describe('Test Attestations Registry Config Logic contract', () => {
             authorizedRange.min,
             authorizedRange.max + 1
           )
-        ).to.be.revertedWith(
-          `IdsMismatch("${issuer.address}", ${authorizedRangeIndex}, ${authorizedRange.min}, ${
-            authorizedRange.max
-          }, ${authorizedRange.min}, ${authorizedRange.max + 1})`
-        );
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `IdsMismatch`)
+          .withArgs(
+            issuer.address,
+            authorizedRangeIndex,
+            authorizedRange.min,
+            authorizedRange.max,
+            authorizedRange.min,
+            authorizedRange.max + 1
+          );
       });
 
       it('Should unauthorize the range for the issuer', async () => {
@@ -296,9 +306,9 @@ describe('Test Attestations Registry Config Logic contract', () => {
             authorizedRanges,
             unauthorizedRangeIndexes
           )
-        ).to.be.revertedWith(
-          `RangeIndexOutOfBounds("${issuer.address}", ${authorizedRangeLength}, ${unauthorizedRangeIndexes[1]})`
-        );
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `RangeIndexOutOfBounds`)
+          .withArgs(issuer.address, authorizedRangeLength, unauthorizedRangeIndexes[1]);
 
         unauthorizedRangeIndexes[0] -= 2;
 
@@ -310,11 +320,9 @@ describe('Test Attestations Registry Config Logic contract', () => {
             authorizedRanges,
             unauthorizedRangeIndexes
           )
-        ).to.be.revertedWith(
-          `RangeIndexOutOfBounds("${issuer.address}", ${authorizedRangeLength}, ${
-            unauthorizedRangeIndexes[1] - 1
-          })`
-        );
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `RangeIndexOutOfBounds`)
+          .withArgs(issuer.address, authorizedRangeLength, unauthorizedRangeIndexes[1] - 1);
       });
 
       it('Should revert when the firstRangeFirstCollectionId mismatch the first collection min', async () => {
@@ -330,13 +338,16 @@ describe('Test Attestations Registry Config Logic contract', () => {
             ],
             authorizedRangeIndexes
           )
-        ).to.be.revertedWith(
-          `IdsMismatch("${issuer.address}", ${authorizedRangeIndexes[0]}, ${
-            authorizedRanges[0].min
-          }, ${authorizedRanges[0].max}, ${authorizedRanges[0].min - 1}, ${
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `IdsMismatch`)
+          .withArgs(
+            issuer.address,
+            authorizedRangeIndexes[0],
+            authorizedRanges[0].min,
+            authorizedRanges[0].max,
+            authorizedRanges[0].min - 1,
             authorizedRanges[0].max
-          })`
-        );
+          );
       });
 
       it('Should revert when the firstRangeLastCollectionId mismatch the first collection max', async () => {
@@ -352,13 +363,16 @@ describe('Test Attestations Registry Config Logic contract', () => {
             ],
             authorizedRangeIndexes
           )
-        ).to.be.revertedWith(
-          `IdsMismatch("${issuer.address}", ${authorizedRangeIndexes[0]}, ${
-            authorizedRanges[0].min
-          }, ${authorizedRanges[0].max}, ${authorizedRanges[0].min}, ${
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `IdsMismatch`)
+          .withArgs(
+            issuer.address,
+            authorizedRangeIndexes[0],
+            authorizedRanges[0].min,
+            authorizedRanges[0].max,
+            authorizedRanges[0].min,
             authorizedRanges[0].max + 1
-          })`
-        );
+          );
       });
 
       it('Should revert when the secondRangeFirstCollectionId mismatch the second collection min', async () => {
@@ -374,11 +388,16 @@ describe('Test Attestations Registry Config Logic contract', () => {
             ],
             authorizedRangeIndexes
           )
-        ).to.be.revertedWith(
-          `IdsMismatch("${issuer.address}", 0, ${authorizedRanges[1].min}, ${
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `IdsMismatch`)
+          .withArgs(
+            issuer.address,
+            0,
+            authorizedRanges[1].min,
+            authorizedRanges[1].max,
+            authorizedRanges[1].min - 1,
             authorizedRanges[1].max
-          }, ${authorizedRanges[1].min - 1}, ${authorizedRanges[1].max})`
-        );
+          );
       });
 
       it('Should revert when the secondRangeLastCollectionId mismatch the second collection max', async () => {
@@ -394,11 +413,16 @@ describe('Test Attestations Registry Config Logic contract', () => {
             ],
             authorizedRangeIndexes
           )
-        ).to.be.revertedWith(
-          `IdsMismatch("${issuer.address}", 0, ${authorizedRanges[1].min}, ${
-            authorizedRanges[1].max
-          }, ${authorizedRanges[1].min}, ${authorizedRanges[1].max + 1})`
-        );
+        )
+          .to.be.revertedWithCustomError(attestationsRegistry, `IdsMismatch`)
+          .withArgs(
+            issuer.address,
+            0,
+            authorizedRanges[1].min,
+            authorizedRanges[1].max,
+            authorizedRanges[1].min,
+            authorizedRanges[1].max + 1
+          );
       });
 
       it('Should unauthorize the ranges for the issuer', async () => {

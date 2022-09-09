@@ -131,10 +131,10 @@ describe('Test Github Merkle attester contract', () => {
       const request = {
         claims: [
           {
-            groupId: groups[0].id,
+            groupId: groups[1].id,
             claimedValue: 1,
             extraData: encodeIdentityGroupProperties(
-              groups[0].properties,
+              groups[1].properties,
               source1.identifier,
               'username'
             ),
@@ -163,18 +163,17 @@ describe('Test Github Merkle attester contract', () => {
       expect(args.attestation.issuer).to.equal(identityAttester.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(deployer.address).toHexString());
       expect(args.attestation.value).to.equal(1);
-      expect(args.attestation.timestamp).to.equal(groups[0].properties.generationTimestamp);
+      expect(args.attestation.timestamp).to.equal(groups[1].properties.generationTimestamp);
       expect(args.attestation.extraData).to.equal(request.claims[0].extraData);
 
       // 2nd Identity Attestation
       const request2 = {
         claims: [
           {
-            groupId: groups[1].id,
+            groupId: groups[2].id,
             claimedValue: 1,
             extraData: encodeIdentityGroupProperties(
-              groups[1].properties,
-              // {...groups[0].properties, groupIndex:1},
+              groups[2].properties,
               source2.identifier,
               'username2'
             ),

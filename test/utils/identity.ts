@@ -37,11 +37,13 @@ export type IdentityList = { [address: string]: number };
 export const generateIdentityLists = (Accounts: IdentityAccountData[]): IdentityList[] => {
   const List1 = {};
   const List2 = {};
+  const List3 = {};
   Accounts.forEach((account, index) => {
     Object.assign(List1, { [account.identifier]: 1 });
     Object.assign(List2, { [account.identifier]: 1 });
+    Object.assign(List3, { [account.identifier]: 1 });
   });
-  return [List1, List2];
+  return [List1, List2, List3];
 };
 
 export type IdentityGroup = {
