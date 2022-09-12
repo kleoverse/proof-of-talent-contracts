@@ -1,7 +1,13 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import hre, { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { MockBadges, MockERC721, SkillBadge } from 'types';
+import {
+  MockBadges,
+  MockERC721,
+  SkillBadge,
+  SkillBadge__factory,
+  TransparentUpgradeableProxy__factory,
+} from '../../../../types';
 import {
   DeployedSkillBadge,
   DeploySkillBadgeArgs,
@@ -14,6 +20,8 @@ import {
   DeployedMockERC721,
   DeployMockERC721Args,
 } from 'tasks/deploy-tasks/tests/deploy-mock-erc721.task';
+import { deploymentsConfig } from '../../../../tasks/deploy-tasks/deployments-config';
+import { getImplementation } from '../../../../utils';
 
 describe('Test Skill Badge contract', () => {
   let deployer: SignerWithAddress;
@@ -55,9 +63,6 @@ describe('Test Skill Badge contract', () => {
 
       ({ skillBadge } = (await hre.run('deploy-skill-badge', {
         uri: 'https://dummyUri.com/',
-        options: {
-          behindProxy: false,
-        },
       } as DeploySkillBadgeArgs)) as DeployedSkillBadge);
 
       expect(await skillBadge.owner()).to.equal(deployer.address);
@@ -107,6 +112,32 @@ describe('Test Skill Badge contract', () => {
         [mockBadges.address, mockBadges.address, mockERC721.address],
         [1, 1, 0],
       ]);
+    });
+  });
+
+  /*************************************************************************************/
+  /******************************* UPDATE IMPLEMENTATION *******************************/
+  /*************************************************************************************/
+  describe('Update implementation', () => {
+    it('Should update the implementation', async () => {
+      const proxyAdminSigner = await ethers.getSigner(
+        deploymentsConfig[hre.network.name].deployOptions.proxyAdmin as string
+      );
+
+      const { skillBadge: newSkillBadge } = await hre.run('deploy-skill-badge', {
+        uri: 'https://token_cdn.domain/',
+        owner: secondDeployer.address,
+        options: { behindProxy: false },
+      });
+      const skillBadgeProxy = TransparentUpgradeableProxy__factory.connect(
+        skillBadge.address,
+        proxyAdminSigner
+      );
+
+      await (await skillBadgeProxy.upgradeTo(newSkillBadge.address)).wait();
+
+      const implementationAddress = await getImplementation(skillBadgeProxy);
+      expect(implementationAddress).to.eql(newSkillBadge.address);
     });
   });
 });

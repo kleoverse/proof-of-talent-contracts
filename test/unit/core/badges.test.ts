@@ -204,7 +204,7 @@ describe('Test Badges contract', () => {
       it('Should revert because the operation is not allowed', async () => {
         await expect(
           badges.connect(user).safeTransferFrom(user.address, admin.address, 3, 1, [])
-        ).to.be.revertedWith('BadgesNonTransferrable()');
+        ).to.be.revertedWithCustomError(badges, 'BadgesNonTransferrable');
       });
     });
 
@@ -214,7 +214,7 @@ describe('Test Badges contract', () => {
           badges
             .connect(user)
             .safeBatchTransferFrom(user.address, admin.address, [3, 4], [1, 1], [])
-        ).to.be.revertedWith('BadgesNonTransferrable()');
+        ).to.be.revertedWithCustomError(badges, 'BadgesNonTransferrable');
       });
     });
   });
@@ -224,15 +224,15 @@ describe('Test Badges contract', () => {
       it('Should revert because the operation is not allowed', async () => {
         await expect(
           badges.connect(user).isApprovedForAll(user.address, admin.address)
-        ).to.be.revertedWith('BadgesNonTransferrable()');
+        ).to.be.revertedWithCustomError(badges, 'BadgesNonTransferrable');
       });
     });
 
     describe('setApprovalForAll', () => {
       it('Should revert because the operation is not allowed', async () => {
-        await expect(badges.connect(user).setApprovalForAll(user.address, true)).to.be.revertedWith(
-          'BadgesNonTransferrable()'
-        );
+        await expect(
+          badges.connect(user).setApprovalForAll(user.address, true)
+        ).to.be.revertedWithCustomError(badges, 'BadgesNonTransferrable');
       });
     });
   });

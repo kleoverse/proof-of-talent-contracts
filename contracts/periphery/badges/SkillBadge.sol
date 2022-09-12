@@ -2,12 +2,13 @@
 pragma solidity ^0.8.14;
 
 import {ERC1155} from '@openzeppelin/contracts/token/ERC1155/ERC1155.sol';
+import {Initializable} from '@openzeppelin/contracts/proxy/utils/Initializable.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import {IAttestationsRegistry} from '../../core/interfaces/IAttestationsRegistry.sol';
 import {IERC1155} from '@openzeppelin/contracts/token/ERC1155/IERC1155.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 
-contract SkillBadge is ERC1155, Ownable {
+contract SkillBadge is Initializable, ERC1155, Ownable {
   error LengthMismatch(uint256[] credIds, uint32[] weights);
 
   event SkillDataSet(
@@ -32,7 +33,18 @@ contract SkillBadge is ERC1155, Ownable {
   }
   mapping(uint256 => SkillData) skills;
 
-  constructor(string memory uri) ERC1155(uri) {}
+  constructor(string memory uri) ERC1155(uri) {
+    initialize(uri);
+  }
+
+  /**
+   * @dev Initializes the contract, to be called by the proxy delegating calls to this implementation
+   * @param uri Uri for the metadata of badges
+   */
+  function initialize(string memory uri) public initializer {
+    _setURI(uri);
+    _transferOwnership(_msgSender());
+  }
 
   function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
     uint256 skillPoints;

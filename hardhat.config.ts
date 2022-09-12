@@ -55,7 +55,7 @@ const getCommonNetworkConfig = (networkName: string, networkId: number) => ({
   url: NETWORKS_RPC_URL[networkName] ?? '',
   // hardfork: HARDFORK,
   chainId: networkId,
-  accounts: [process.env.RINKEBY_PRIVATE_KEY!]
+  accounts: [process.env.RINKEBY_PRIVATE_KEY || Wallet.createRandom().privateKey]
   // accounts: {
   //   mnemonic: MNEMONIC,
   //   path: MNEMONIC_PATH,

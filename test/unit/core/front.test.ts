@@ -317,7 +317,7 @@ describe('Test Front contract', () => {
           [requests.first, { ...requests.second, destination: secondUserDestination.address }],
           ['0x', '0x']
         )
-      ).to.be.revertedWith('DifferentRequestsDestinations()');
+      ).to.be.revertedWithCustomError(front, 'DifferentRequestsDestinations');
     });
 
     it('Should forward generationAttestations call to the attester', async () => {

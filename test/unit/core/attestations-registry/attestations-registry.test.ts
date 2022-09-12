@@ -112,9 +112,9 @@ describe('Test Attestations Registry contract', () => {
             { ...attestations.first, collectionId: firstAuthorizedRange.min - 1 },
             attestations.second,
           ])
-      ).to.be.revertedWith(
-        `IssuerNotAuthorized("${issuer.address}", ${firstAuthorizedRange.min - 1})`
-      );
+      )
+        .to.be.revertedWithCustomError(attestationsRegistry, `IssuerNotAuthorized`)
+        .withArgs(issuer.address, firstAuthorizedRange.min - 1);
 
       await attestationsRegistry.authorizeRange(
         issuer.address,
@@ -129,9 +129,9 @@ describe('Test Attestations Registry contract', () => {
             attestations.first,
             { ...attestations.second, collectionId: secondAuthorizedRange.min - 1 },
           ])
-      ).to.be.revertedWith(
-        `IssuerNotAuthorized("${issuer.address}", ${secondAuthorizedRange.min - 1})`
-      );
+      )
+        .to.be.revertedWithCustomError(attestationsRegistry, `IssuerNotAuthorized`)
+        .withArgs(issuer.address, secondAuthorizedRange.min - 1);
     });
 
     it('Should record attestations', async () => {
@@ -554,9 +554,9 @@ describe('Test Attestations Registry contract', () => {
             [attestations.first.owner, attestations.second.owner],
             [firstAuthorizedRange.min - 1, attestations.second.collectionId]
           )
-      ).to.be.revertedWith(
-        `IssuerNotAuthorized("${issuer.address}", ${firstAuthorizedRange.min - 1})`
-      );
+      )
+        .to.be.revertedWithCustomError(attestationsRegistry, `IssuerNotAuthorized`)
+        .withArgs(issuer.address, firstAuthorizedRange.min - 1);
 
       await attestationsRegistry.authorizeRange(
         issuer.address,
@@ -571,9 +571,9 @@ describe('Test Attestations Registry contract', () => {
             [attestations.first.owner, attestations.second.owner],
             [attestations.first.collectionId, secondAuthorizedRange.min - 1]
           )
-      ).to.be.revertedWith(
-        `IssuerNotAuthorized("${issuer.address}", ${secondAuthorizedRange.min - 1})`
-      );
+      )
+        .to.be.revertedWithCustomError(attestationsRegistry, `IssuerNotAuthorized`)
+        .withArgs(issuer.address, secondAuthorizedRange.min - 1);
     });
 
     it('Should delete the attestations', async () => {

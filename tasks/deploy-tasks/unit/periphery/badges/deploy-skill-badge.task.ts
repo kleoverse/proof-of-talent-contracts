@@ -35,9 +35,10 @@ async function deploymentAction(
 
   await beforeDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, options);
 
-  const initData = '0x';
+  const initData = new SkillBadge__factory(deployer).interface.encodeFunctionData('initialize', [
+    uri,
+  ]);
 
-  if (options?.behindProxy) options.behindProxy = false;
   const deployed = await customDeployContract(
     hre,
     deployer,
