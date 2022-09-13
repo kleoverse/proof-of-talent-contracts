@@ -23,6 +23,7 @@ import {
 
 const config = deploymentsConfig[hre.network.name];
 const collectionIdFirst = BigNumber.from(config.skillAttester.collectionIdFirst);
+const collectionIdLast = BigNumber.from(config.skillAttester.collectionIdLast);
 
 describe('Test Skill attester contract', () => {
   // contracts
@@ -172,6 +173,22 @@ describe('Test Skill attester contract', () => {
       await expect(skillAttester.generateAttestations(request, '0x'))
         .to.be.revertedWithCustomError(skillAttester, 'ClaimValueInvalid')
         .withArgs(claimValue, invalidClaimValue);
+    });
+    it('Should revert due to groupId out of authorized range', async () => {
+      request = {
+        claims: [
+          {
+            groupId: collectionIdLast.sub(collectionIdFirst).add(1),
+            claimedValue: await mockSkillBadge.balanceOf(source1.account, 0),
+            extraData: encodeSkillGroupProperties(group1.properties),
+          },
+        ],
+        destination: destination1.account,
+      };
+
+      await expect(skillAttester.generateAttestations(request, '0x'))
+        .revertedWithCustomError(skillAttester, 'CollectionIdOutOfBound')
+        .withArgs(collectionIdLast.add(1));
     });
 
     /****************************************/

@@ -80,6 +80,9 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
 
     uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + claim.groupId;
 
+    if (attestationCollectionId > AUTHORIZED_COLLECTION_ID_LAST)
+      revert CollectionIdOutOfBound(attestationCollectionId);
+
     address issuer = address(this);
 
     attestations[0] = Attestation(

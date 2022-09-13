@@ -3,12 +3,11 @@
 pragma solidity ^0.8.14;
 pragma experimental ABIEncoderV2;
 
-interface IGithubMerkleAttester {
+interface ISignatureAttester {
+  error SignatureDeadlineExpired(uint256 deadline);
+  error SignatureInvalid(address expectedSigner, address signer);
   error SourceAlreadyUsed(address source);
-  error GroupNotAvailable();
-  error ClaimInvalid();
-  error IdentityDoesNotExist();
-  error IdentityInvalid();
+  error CollectionIdOutOfBound(uint256 collectionId);
 
   event SourceToDestinationUpdated(uint256 attestationId, address source, address destination);
 

@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.14;
+pragma experimental ABIEncoderV2;
 
 import '@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol';
 // Core protocol Protocol imports
-import {IIdentityAttester} from './interfaces/IIdentityAttester.sol';
+import {ISignatureAttester} from './interfaces/ISignatureAttester.sol';
 import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.sol';
-import {IdentityGroupProperties, EIP712Signature} from './libs/IdentityAttesterLib.sol';
+import {SignatureGroupProperties, EIP712Signature} from './libs/SignatureAttesterLib.sol';
 
-contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
+contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
   bytes32 private constant _ATTESTATION_REQUEST_TYPEHASH =
     keccak256(
       'AttestationRequest(uint256 groupId,uint256 claimedValue,bytes extraData,address destination,uint256 deadline)'
@@ -36,7 +37,7 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
     uint256 collectionIdFirst,
     uint256 collectionIdLast,
     address verifierAddress
-  ) Attester(attestationsRegistryAddress) EIP712('IdentityAttester', '1') {
+  ) Attester(attestationsRegistryAddress) EIP712('SignatureAttester', '1') {
     AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
     AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
     _verifierAddress = verifierAddress;
@@ -91,14 +92,13 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
     returns (Attestation[] memory)
   {
     Claim memory claim = request.claims[0];
-    IdentityGroupProperties memory groupProperties = abi.decode(
-      claim.extraData,
-      (IdentityGroupProperties)
-    );
 
     Attestation[] memory attestations = new Attestation[](1);
 
     uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + claim.groupId;
+
+    if (attestationCollectionId > AUTHORIZED_COLLECTION_ID_LAST)
+      revert CollectionIdOutOfBound(attestationCollectionId);
 
     address issuer = address(this);
 
@@ -107,7 +107,7 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
       request.destination,
       issuer,
       claim.claimedValue,
-      groupProperties.generationTimestamp,
+      uint32(block.timestamp),
       claim.extraData
     );
     return (attestations);
@@ -139,7 +139,7 @@ contract IdentityAttester is IIdentityAttester, Attester, EIP712 {
   }
 
   /*******************************************************
-    Github Attester Specific Functions
+    Signature Attester Specific Functions
   *******************************************************/
 
   /**
