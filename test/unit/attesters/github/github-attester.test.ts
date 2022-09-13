@@ -128,6 +128,7 @@ describe('Test Github attester contract', () => {
       expect(args.attestation.value).to.equal(1);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
     });
+
     it('Should update existing attestation', async () => {
       const deadline = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
@@ -163,6 +164,43 @@ describe('Test Github attester contract', () => {
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(2);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
+    });
+
+    it('Should generate attestation from same source-destination pair for another collectionId', async () => {
+      const deadline = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+      request = {
+        claims: [
+          {
+            groupId: group2.id,
+            claimedValue: source1Value,
+            extraData: encodeGithubGroupProperties(group2.properties),
+          },
+        ],
+        destination: destination2.account,
+      };
+
+      const signData = generateEIP712TypedSignData(
+        request,
+        githubAttester.address,
+        deadline,
+        GithubAttesterDomainName
+      );
+      const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
+      const { r, s, v } = utils.splitSignature(sig);
+      const data = ethers.utils.defaultAbiCoder.encode(
+        ['uint8', 'bytes32', 'bytes32', 'uint256'],
+        [v, r, s, deadline]
+      );
+      const tx = await githubAttester.generateAttestations(request, data);
+      const { events } = await tx.wait();
+      const args = getEventArgs(events, 'AttestationGenerated');
+
+      expect(args.attestation.issuer).to.equal(githubAttester.address);
+      expect(args.attestation.owner).to.equal(BigNumber.from(destination2.account).toHexString());
+      expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(1));
+      expect(args.attestation.value).to.equal(1);
+      expect(args.attestation.timestamp).to.equal(group2.properties.generationTimestamp);
     });
   });
 

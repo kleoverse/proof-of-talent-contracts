@@ -21,7 +21,7 @@ contract GithubAttester is IGithubAttester, Attester, EIP712 {
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
   address internal _verifierAddress;
-  mapping(address => address) internal _sourcesToDestinations;
+  mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
   /*******************************************************
     INITIALIZATION FUNCTIONS                           
@@ -129,13 +129,14 @@ contract GithubAttester is IGithubAttester, Attester, EIP712 {
     virtual
     override
   {
-    address currentDestination = _getDestinationOfSource(msg.sender);
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + request.claims[0].groupId;
+    address currentDestination = _getDestinationOfSource(attestationCollectionId, msg.sender);
 
     if (currentDestination != address(0) && currentDestination != request.destination) {
       revert SourceAlreadyUsed(msg.sender);
     }
 
-    _setDestinationForSource(msg.sender, request.destination);
+    _setDestinationForSource(attestationCollectionId, msg.sender, request.destination);
   }
 
   /*******************************************************
@@ -146,16 +147,29 @@ contract GithubAttester is IGithubAttester, Attester, EIP712 {
    * @dev Getter, returns the last attestation destination of a source
    * @param source address used
    **/
-  function getDestinationOfSource(address source) external view override returns (address) {
-    return _getDestinationOfSource(source);
+  function getDestinationOfSource(uint256 attestationId, address source)
+    external
+    view
+    override
+    returns (address)
+  {
+    return _getDestinationOfSource(attestationId, source);
   }
 
-  function _setDestinationForSource(address source, address destination) internal virtual {
-    _sourcesToDestinations[source] = destination;
-    emit SourceToDestinationUpdated(source, destination);
+  function _setDestinationForSource(
+    uint256 attestationId,
+    address source,
+    address destination
+  ) internal virtual {
+    _sourcesToDestinations[attestationId][source] = destination;
+    emit SourceToDestinationUpdated(attestationId, source, destination);
   }
 
-  function _getDestinationOfSource(address source) internal view returns (address) {
-    return _sourcesToDestinations[source];
+  function _getDestinationOfSource(uint256 attestationId, address source)
+    internal
+    view
+    returns (address)
+  {
+    return _sourcesToDestinations[attestationId][source];
   }
 }
