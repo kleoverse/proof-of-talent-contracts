@@ -15,15 +15,15 @@ import { keccak256 } from 'ethers/lib/utils';
 /**************    MOCK ACCOUNTS     *************/
 /*************************************************/
 
-export type GithubMerkleData = {
+export type IdentityMerkleData = {
   identifier: string;
 };
 
-export const generateGithubMerkleAccounts = async (signers): Promise<GithubMerkleData[]> => {
-  const accounts: GithubMerkleData[] = [];
+export const generateIdentityMerkleAccounts = async (signers): Promise<IdentityMerkleData[]> => {
+  const accounts: IdentityMerkleData[] = [];
   for (const signer of signers) {
     accounts.push({
-      identifier: BigNumber.from('0x' + uuidv4().replace(/-/g, '')).toHexString(),
+      identifier: uuidv4(), // BigNumber.from('0x' + uuidv4().replace(/-/g, '')).toHexString(),
     });
   }
   return accounts;
@@ -35,43 +35,43 @@ export const generateGithubMerkleAccounts = async (signers): Promise<GithubMerkl
 
 type List = { [address: string]: [value: number] };
 
-export const generateGithubMerkleLists = (Accounts: GithubMerkleData[]): List[] => {
+export const generateIdentityMerkleLists = (Accounts: IdentityMerkleData[]): List[] => {
   const List1 = {};
   const List2 = {};
   Accounts.forEach((account, index) => {
-    Object.assign(List1, { [BigNumber.from(account.identifier).toHexString()]: index });
-    Object.assign(List2, { [BigNumber.from(account.identifier).toHexString()]: index + 1000 });
+    Object.assign(List1, { [account.identifier]: index });
+    Object.assign(List2, { [account.identifier]: index + 1000 });
   });
   return [List1, List2];
 };
 
-export type GithubMerkleGroup = {
+export type IdentityMerkleGroup = {
   data: MerkleTreeData;
-  properties: GithubMerkleGroupProperties;
+  properties: IdentityMerkleGroupProperties;
   id: string;
 };
 
-export type GithubMerkleGroupProperties = {
+export type IdentityMerkleGroupProperties = {
   groupIndex: number;
   generationTimestamp: number;
 };
 
-export type GithubMerkleRegistryAccountsMerkle = {
+export type IdentityMerkleRegistryAccountsMerkle = {
   accountsTrees: MerkleTree[];
   registryTree: MerkleTree;
 };
 
-export type GithubMerkleAttesterGroups = {
-  groups: GithubMerkleGroup[];
-  dataFormat: GithubMerkleRegistryAccountsMerkle;
+export type IdentityMerkleAttesterGroups = {
+  groups: IdentityMerkleGroup[];
+  dataFormat: IdentityMerkleRegistryAccountsMerkle;
 };
 
-export const generateGithubMerkleAttesterGroups = async (
+export const generateIdentityMerkleAttesterGroups = async (
   allList: List[]
-): Promise<GithubMerkleAttesterGroups> => {
+): Promise<IdentityMerkleAttesterGroups> => {
   /*********************** GENERATE GROUPS *********************/
 
-  const groups: GithubMerkleGroup[] = [];
+  const groups: IdentityMerkleGroup[] = [];
   let generationTimestamp = Math.round(Date.now() / 1000);
 
   for (let i = 0; i < allList.length; i++) {
@@ -114,8 +114,8 @@ export const generateGithubMerkleAttesterGroups = async (
   };
 };
 
-export const encodeGithubMerkleGroupProperties = (
-  groupProperties: GithubMerkleGroupProperties,
+export const encodeIdentityMerkleGroupProperties = (
+  groupProperties: IdentityMerkleGroupProperties,
   accountId: string
 ): string => {
   return ethers.utils.defaultAbiCoder.encode(
@@ -144,7 +144,7 @@ export const generateLeavesFromData = (data: MerkleTreeData) => {
   );
 };
 
-export const encodeGithubMerkleProofData = (
+export const encodeIdentityMerkleProofData = (
   path: any[],
   accountId: string,
   identityAttestationId: BigNumber

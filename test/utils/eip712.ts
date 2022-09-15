@@ -1,5 +1,5 @@
 import hre from 'hardhat';
-import { RequestStruct } from 'types/GithubAttester';
+import { RequestStruct } from 'types/SignatureAttester';
 
 export const generateEIP712TypedSignData = (
   request: RequestStruct,

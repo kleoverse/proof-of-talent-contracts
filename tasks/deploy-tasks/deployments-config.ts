@@ -56,17 +56,12 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
-    githubAttester: {
+    signatureAttester: {
       collectionIdFirst: '300001',
       collectionIdLast: '400000',
       verifierAddress: ALPHA_POLYGON_VERIFIER,
     },
-    identityAttester: {
-      collectionIdFirst: '400001',
-      collectionIdLast: '500000',
-      verifierAddress: ALPHA_POLYGON_VERIFIER,
-    },
-    githubMerkleAttester: {
+    identityMerkleAttester: {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
     },
@@ -118,17 +113,12 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
-    githubAttester: {
+    signatureAttester: {
       collectionIdFirst: '300001',
       collectionIdLast: '400000',
       verifierAddress: ALPHA_RINKEBY_VERIFIER,
     },
-    identityAttester: {
-      collectionIdFirst: '400001',
-      collectionIdLast: '500000',
-      verifierAddress: ALPHA_RINKEBY_VERIFIER,
-    },
-    githubMerkleAttester: {
+    identityMerkleAttester: {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
     },
@@ -178,17 +168,12 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
-    githubAttester: {
+    signatureAttester: {
       collectionIdFirst: '300001',
       collectionIdLast: '400000',
       verifierAddress: ALPHA_RINKEBY_VERIFIER,
     },
-    identityAttester: {
-      collectionIdFirst: '400001',
-      collectionIdLast: '500000',
-      verifierAddress: ALPHA_RINKEBY_VERIFIER,
-    },
-    githubMerkleAttester: {
+    identityMerkleAttester: {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
     },
@@ -239,17 +224,12 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
     },
-    githubAttester: {
+    signatureAttester: {
       collectionIdFirst: '300001',
       collectionIdLast: '400000',
       verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
     },
-    identityAttester: {
-      collectionIdFirst: '400001',
-      collectionIdLast: '500000',
-      verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
-    },
-    githubMerkleAttester: {
+    identityMerkleAttester: {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
     },
@@ -300,17 +280,12 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
     },
-    githubAttester: {
+    signatureAttester: {
       collectionIdFirst: '300001',
       collectionIdLast: '400000',
       verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
     },
-    identityAttester: {
-      collectionIdFirst: '400001',
-      collectionIdLast: '500000',
-      verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
-    },
-    githubMerkleAttester: {
+    identityMerkleAttester: {
       collectionIdFirst: '500001',
       collectionIdLast: '600000',
     },

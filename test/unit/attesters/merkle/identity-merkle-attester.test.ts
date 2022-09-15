@@ -4,9 +4,8 @@ import {
   AttestationsRegistry,
   AvailableRootsRegistry,
   Badges,
-  GithubAttester,
-  GithubMerkleAttester,
-  IdentityAttester,
+  IdentityMerkleAttester,
+  SignatureAttester,
 } from 'types';
 import { RequestStruct } from 'types/Attester';
 
@@ -15,38 +14,38 @@ import { BigNumber, ethers, utils } from 'ethers';
 import { Deployed0 } from 'tasks/deploy-tasks/full/0-deploy-core-and-hydra-s1-simple-and-soulbound.task';
 import { deploymentsConfig } from '../../../../tasks/deploy-tasks/deployments-config';
 import {
-  generateGithubMerkleAccounts,
-  GithubMerkleData,
-  generateGithubMerkleLists,
-  generateGithubMerkleAttesterGroups,
-  GithubMerkleGroup,
-  encodeGithubMerkleGroupProperties,
-  encodeGithubMerkleProofData,
+  generateIdentityMerkleAccounts,
+  IdentityMerkleData,
+  generateIdentityMerkleLists,
+  generateIdentityMerkleAttesterGroups,
+  IdentityMerkleGroup,
+  encodeIdentityMerkleGroupProperties,
+  encodeIdentityMerkleProofData,
   getEventArgs,
-  encodeIdentityGroupProperties,
+  encodeSignatureGroupProperties,
   generateEIP712TypedSignData,
-  IdentityAttesterDomainName,
-  IdentityAccountData,
-  generateIdentityAccounts,
-  generateIdentityLists,
-  generateIdentityAttesterGroups,
+  SignatureAttesterDomainName,
+  SignatureAccountData,
+  generateSignatureAccounts,
+  generateSignatureLists,
+  generateSignatureAttesterGroups,
+  encodeIdentityBadgeData,
 } from '../../../utils';
 import { keccak256, KVMerkleTree } from '@sismo-core/hydra-s1';
 import MerkleTree from 'merkletreejs';
 
 const config = deploymentsConfig[hre.network.name];
-const collectionIdFirst = BigNumber.from(config.githubMerkleAttester.collectionIdFirst);
-const collectionIdLast = BigNumber.from(config.githubMerkleAttester.collectionIdLast);
+const collectionIdFirst = BigNumber.from(config.identityMerkleAttester.collectionIdFirst);
+const collectionIdLast = BigNumber.from(config.identityMerkleAttester.collectionIdLast);
 
-describe('Test Github Merkle attester contract', () => {
+describe('Test Identity Merkle attester contract', () => {
   let chainId: number;
 
   // contracts
   let attestationsRegistry: AttestationsRegistry;
   let availableRootsRegistry: AvailableRootsRegistry;
-  let githubAttester: GithubAttester;
-  let identityAttester: IdentityAttester;
-  let githubMerkleAttester: GithubMerkleAttester;
+  let signatureAttester: SignatureAttester;
+  let identityMerkleAttester: IdentityMerkleAttester;
   let badges: Badges;
 
   // Merkle tree
@@ -60,8 +59,8 @@ describe('Test Github Merkle attester contract', () => {
   let attesterOracle: SignerWithAddress;
 
   // Test accounts
-  let source1: GithubMerkleData;
-  let source2: GithubMerkleData;
+  let source1: IdentityMerkleData;
+  let source2: IdentityMerkleData;
   let destination1: SignerWithAddress;
   let destination2: SignerWithAddress;
 
@@ -69,8 +68,8 @@ describe('Test Github Merkle attester contract', () => {
   let source1Value: BigNumber;
   let accountsTree1: MerkleTree;
   let accountsTree2: MerkleTree;
-  let group1: GithubMerkleGroup;
-  let group2: GithubMerkleGroup;
+  let group1: IdentityMerkleGroup;
+  let group2: IdentityMerkleGroup;
   let root: string;
   let identityAttestationId: BigNumber;
 
@@ -82,14 +81,14 @@ describe('Test Github Merkle attester contract', () => {
     [deployer, randomSigner, proxyAdminSigner, attesterOracle, destination1, destination2] =
       signers;
 
-    let accounts: GithubMerkleData[] = await generateGithubMerkleAccounts(signers);
+    let accounts: IdentityMerkleData[] = await generateIdentityMerkleAccounts(signers);
 
     source1 = accounts[0];
     source2 = accounts[1];
 
     // Generate data source
-    const allList = await generateGithubMerkleLists(accounts);
-    const { dataFormat, groups } = await generateGithubMerkleAttesterGroups(allList);
+    const allList = await generateIdentityMerkleLists(accounts);
+    const { dataFormat, groups } = await generateIdentityMerkleAttesterGroups(allList);
 
     registryTree = dataFormat.registryTree;
     accountsTree1 = dataFormat.accountsTrees[0];
@@ -108,36 +107,37 @@ describe('Test Github Merkle attester contract', () => {
       ({
         attestationsRegistry,
         badges,
-        identityAttester,
-        githubMerkleAttester,
+        signatureAttester,
+        identityMerkleAttester,
         availableRootsRegistry,
       } = (await hre.run('0-deploy-core-and-hydra-s1-simple-and-soulbound', {
         options: { log: false },
       })) as Deployed0);
       root = accountsTree1.getHexRoot();
-      await availableRootsRegistry.registerRootForAttester(githubMerkleAttester.address, root);
+      await availableRootsRegistry.registerRootForAttester(identityMerkleAttester.address, root);
       expect(
-        await availableRootsRegistry.isRootAvailableForAttester(githubMerkleAttester.address, root)
+        await availableRootsRegistry.isRootAvailableForAttester(
+          identityMerkleAttester.address,
+          root
+        )
       ).to.equal(true);
     });
     it('Should generate identity attestations', async () => {
       const deadline = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
 
-      let accounts: IdentityAccountData[] = await generateIdentityAccounts(signers);
+      let accounts: SignatureAccountData[] = await generateSignatureAccounts(signers);
 
-      const allList = await generateIdentityLists(accounts);
-      const { groups } = await generateIdentityAttesterGroups(allList);
+      const allList = await generateSignatureLists(accounts);
+      const { groups } = await generateSignatureAttesterGroups(allList);
 
+      let badgeData = encodeIdentityBadgeData({ ...accounts[2], identifier: source1.identifier });
+      groups[2].properties.badgeData = badgeData;
       const request = {
         claims: [
           {
-            groupId: groups[1].id,
+            groupId: groups[2].id,
             claimedValue: 1,
-            extraData: encodeIdentityGroupProperties(
-              groups[1].properties,
-              source1.identifier,
-              'username'
-            ),
+            extraData: encodeSignatureGroupProperties(groups[2].properties),
           },
         ],
         destination: deployer.address,
@@ -145,9 +145,9 @@ describe('Test Github Merkle attester contract', () => {
 
       const signData = generateEIP712TypedSignData(
         request,
-        identityAttester.address,
+        signatureAttester.address,
         deadline,
-        IdentityAttesterDomainName
+        SignatureAttesterDomainName
       );
       const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
       const { r, s, v } = utils.splitSignature(sig);
@@ -155,28 +155,25 @@ describe('Test Github Merkle attester contract', () => {
         ['uint8', 'bytes32', 'bytes32', 'uint256'],
         [v, r, s, deadline]
       );
-      const tx = await identityAttester.generateAttestations(request, data);
+      const tx = await signatureAttester.generateAttestations(request, data);
       const { events } = await tx.wait();
       const args = getEventArgs(events, 'AttestationGenerated');
       identityAttestationId = args.attestation.collectionId;
 
-      expect(args.attestation.issuer).to.equal(identityAttester.address);
+      expect(args.attestation.issuer).to.equal(signatureAttester.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(deployer.address).toHexString());
       expect(args.attestation.value).to.equal(1);
-      expect(args.attestation.timestamp).to.equal(groups[1].properties.generationTimestamp);
       expect(args.attestation.extraData).to.equal(request.claims[0].extraData);
 
       // 2nd Identity Attestation
+      badgeData = encodeIdentityBadgeData({ ...accounts[3], identifier: source2.identifier });
+      groups[3].properties.badgeData = badgeData;
       const request2 = {
         claims: [
           {
-            groupId: groups[2].id,
+            groupId: groups[3].id,
             claimedValue: 1,
-            extraData: encodeIdentityGroupProperties(
-              groups[2].properties,
-              source2.identifier,
-              'username2'
-            ),
+            extraData: encodeSignatureGroupProperties(groups[3].properties),
           },
         ],
         destination: deployer.address,
@@ -184,9 +181,9 @@ describe('Test Github Merkle attester contract', () => {
 
       const signData2 = generateEIP712TypedSignData(
         request2,
-        identityAttester.address,
+        signatureAttester.address,
         deadline,
-        IdentityAttesterDomainName
+        SignatureAttesterDomainName
       );
       const sig2 = await deployer._signTypedData(
         signData2.domain,
@@ -198,7 +195,39 @@ describe('Test Github Merkle attester contract', () => {
         ['uint8', 'bytes32', 'bytes32', 'uint256'],
         [splitSig.v, splitSig.r, splitSig.s, deadline]
       );
-      await (await identityAttester.generateAttestations(request2, data2)).wait();
+      await (await signatureAttester.generateAttestations(request2, data2)).wait();
+
+      // 3rd Identity Attestation
+      // badgeData = encodeIdentityBadgeData({...accounts[4], identifier: source2.identifier});
+      // groups[4].properties.badgeData = badgeData;
+      const request3 = {
+        claims: [
+          {
+            groupId: groups[4].id,
+            claimedValue: 1,
+            extraData: encodeSignatureGroupProperties(groups[4].properties),
+          },
+        ],
+        destination: deployer.address,
+      };
+
+      const signData3 = generateEIP712TypedSignData(
+        request3,
+        signatureAttester.address,
+        deadline,
+        SignatureAttesterDomainName
+      );
+      const sig3 = await deployer._signTypedData(
+        signData3.domain,
+        signData3.types,
+        signData3.message
+      );
+      const splitSig3 = utils.splitSignature(sig3);
+      const data3 = ethers.utils.defaultAbiCoder.encode(
+        ['uint8', 'bytes32', 'bytes32', 'uint256'],
+        [splitSig3.v, splitSig3.r, splitSig3.s, deadline]
+      );
+      await (await signatureAttester.generateAttestations(request3, data3)).wait();
     });
   });
 
@@ -213,7 +242,7 @@ describe('Test Github Merkle attester contract', () => {
           {
             groupId: root,
             claimedValue: source1Value,
-            extraData: encodeGithubMerkleGroupProperties(group1.properties, source1.identifier),
+            extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
         destination: destination1.address,
@@ -224,12 +253,12 @@ describe('Test Github Merkle attester contract', () => {
           ethers.utils.solidityPack(['string', 'uint256'], [source1.identifier, source1Value])
         )
       );
-      const data = encodeGithubMerkleProofData(path, source1.identifier, identityAttestationId);
-      const tx = await githubMerkleAttester.generateAttestations(request, data);
+      const data = encodeIdentityMerkleProofData(path, source1.identifier, identityAttestationId);
+      const tx = await identityMerkleAttester.generateAttestations(request, data);
       const { events } = await tx.wait();
       const args = getEventArgs(events, 'AttestationGenerated');
 
-      expect(args.attestation.issuer).to.equal(githubMerkleAttester.address);
+      expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(0);
@@ -242,7 +271,7 @@ describe('Test Github Merkle attester contract', () => {
           {
             groupId: root,
             claimedValue: source1Value,
-            extraData: encodeGithubMerkleGroupProperties(group1.properties, source1.identifier),
+            extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
         destination: destination1.address,
@@ -253,12 +282,12 @@ describe('Test Github Merkle attester contract', () => {
           ethers.utils.solidityPack(['string', 'uint256'], [source1.identifier, source1Value])
         )
       );
-      const data = encodeGithubMerkleProofData(path, source1.identifier, identityAttestationId);
-      const tx = await githubMerkleAttester.generateAttestations(request, data);
+      const data = encodeIdentityMerkleProofData(path, source1.identifier, identityAttestationId);
+      const tx = await identityMerkleAttester.generateAttestations(request, data);
       const { events } = await tx.wait();
       const args = getEventArgs(events, 'AttestationGenerated');
 
-      expect(args.attestation.issuer).to.equal(githubMerkleAttester.address);
+      expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(0);
@@ -281,7 +310,7 @@ describe('Test Github Merkle attester contract', () => {
           {
             groupId: invalidRoot,
             claimedValue: source1Value,
-            extraData: encodeGithubMerkleGroupProperties(group2.properties, source1.identifier),
+            extraData: encodeIdentityMerkleGroupProperties(group2.properties, source1.identifier),
           },
         ],
         destination: destination1.address,
@@ -292,10 +321,10 @@ describe('Test Github Merkle attester contract', () => {
           ethers.utils.solidityPack(['string', 'uint256'], [source1.identifier, source1Value])
         )
       );
-      const data = encodeGithubMerkleProofData(path, source1.identifier, identityAttestationId);
+      const data = encodeIdentityMerkleProofData(path, source1.identifier, identityAttestationId);
       await expect(
-        githubMerkleAttester.generateAttestations(request, data)
-      ).to.be.revertedWithCustomError(githubMerkleAttester, 'GroupNotAvailable');
+        identityMerkleAttester.generateAttestations(request, data)
+      ).to.be.revertedWithCustomError(identityMerkleAttester, 'GroupNotAvailable');
     });
     /****************************************/
     /************** _verifyProof() **********/
@@ -306,7 +335,7 @@ describe('Test Github Merkle attester contract', () => {
           {
             groupId: root,
             claimedValue: source1Value.add(1),
-            extraData: encodeGithubMerkleGroupProperties(group1.properties, source1.identifier),
+            extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
         destination: destination1.address,
@@ -317,10 +346,10 @@ describe('Test Github Merkle attester contract', () => {
           ethers.utils.solidityPack(['string', 'uint256'], [source1.identifier, source1Value])
         )
       );
-      const data = encodeGithubMerkleProofData(path, source1.identifier, identityAttestationId);
+      const data = encodeIdentityMerkleProofData(path, source1.identifier, identityAttestationId);
       await expect(
-        githubMerkleAttester.generateAttestations(request, data)
-      ).to.be.revertedWithCustomError(githubMerkleAttester, 'ClaimInvalid');
+        identityMerkleAttester.generateAttestations(request, data)
+      ).to.be.revertedWithCustomError(identityMerkleAttester, 'ClaimInvalid');
     });
     it('Should revert due to invalid identity', async () => {
       request = {
@@ -328,7 +357,7 @@ describe('Test Github Merkle attester contract', () => {
           {
             groupId: root,
             claimedValue: source1Value,
-            extraData: encodeGithubMerkleGroupProperties(group1.properties, source1.identifier),
+            extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
         destination: destination1.address,
@@ -339,14 +368,40 @@ describe('Test Github Merkle attester contract', () => {
           ethers.utils.solidityPack(['string', 'uint256'], [source1.identifier, source1Value])
         )
       );
-      const data = encodeGithubMerkleProofData(
+      const data = encodeIdentityMerkleProofData(
         path,
         source1.identifier,
         identityAttestationId.add(1)
       );
       await expect(
-        githubMerkleAttester.generateAttestations(request, data)
-      ).to.be.revertedWithCustomError(githubMerkleAttester, 'IdentityInvalid');
+        identityMerkleAttester.generateAttestations(request, data)
+      ).to.be.revertedWithCustomError(identityMerkleAttester, 'IdentityInvalid');
+    });
+    it('Should revert due to invalid badge', async () => {
+      request = {
+        claims: [
+          {
+            groupId: root,
+            claimedValue: source1Value,
+            extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
+          },
+        ],
+        destination: destination1.address,
+      };
+
+      const path = accountsTree1.getHexProof(
+        ethers.utils.keccak256(
+          ethers.utils.solidityPack(['string', 'uint256'], [source1.identifier, source1Value])
+        )
+      );
+      const data = encodeIdentityMerkleProofData(
+        path,
+        source1.identifier,
+        identityAttestationId.add(2)
+      );
+      await expect(
+        identityMerkleAttester.generateAttestations(request, data)
+      ).to.be.revertedWithCustomError(identityMerkleAttester, 'BadgeInvalid');
     });
     it('Should revert due to unexisting identity', async () => {
       request = {
@@ -354,7 +409,7 @@ describe('Test Github Merkle attester contract', () => {
           {
             groupId: root,
             claimedValue: source1Value,
-            extraData: encodeGithubMerkleGroupProperties(group1.properties, source1.identifier),
+            extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
         destination: destination1.address,
@@ -365,14 +420,14 @@ describe('Test Github Merkle attester contract', () => {
           ethers.utils.solidityPack(['string', 'uint256'], [source1.identifier, source1Value])
         )
       );
-      const data = encodeGithubMerkleProofData(
+      const data = encodeIdentityMerkleProofData(
         path,
         source1.identifier,
-        identityAttestationId.add(2)
+        identityAttestationId.add(3)
       );
       await expect(
-        githubMerkleAttester.generateAttestations(request, data)
-      ).to.be.revertedWithCustomError(githubMerkleAttester, 'IdentityDoesNotExist');
+        identityMerkleAttester.generateAttestations(request, data)
+      ).to.be.revertedWithCustomError(identityMerkleAttester, 'IdentityDoesNotExist');
     });
   });
   /*************************************************************************************/
@@ -385,7 +440,7 @@ describe('Test Github Merkle attester contract', () => {
           {
             groupId: root,
             claimedValue: source1Value,
-            extraData: encodeGithubMerkleGroupProperties(group1.properties, source1.identifier),
+            extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
         destination: destination2.address,
@@ -396,9 +451,9 @@ describe('Test Github Merkle attester contract', () => {
           ethers.utils.solidityPack(['string', 'uint256'], [source1.identifier, source1Value])
         )
       );
-      const data = encodeGithubMerkleProofData(path, source1.identifier, identityAttestationId);
-      await expect(githubMerkleAttester.generateAttestations(request, data))
-        .to.be.revertedWithCustomError(githubMerkleAttester, `SourceAlreadyUsed`)
+      const data = encodeIdentityMerkleProofData(path, source1.identifier, identityAttestationId);
+      await expect(identityMerkleAttester.generateAttestations(request, data))
+        .to.be.revertedWithCustomError(identityMerkleAttester, `SourceAlreadyUsed`)
         .withArgs(deployer.address);
     });
   });

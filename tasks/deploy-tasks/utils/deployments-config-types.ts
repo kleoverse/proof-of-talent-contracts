@@ -27,17 +27,12 @@ export type DeploymentsConfigTypes = {
       collectionIdLast: string;
       initialRoot: string;
     };
-    githubAttester: {
+    signatureAttester: {
       collectionIdFirst: string;
       collectionIdLast: string;
       verifierAddress: string;
     };
-    identityAttester: {
-      collectionIdFirst: string;
-      collectionIdLast: string;
-      verifierAddress: string;
-    };
-    githubMerkleAttester: {
+    identityMerkleAttester: {
       collectionIdFirst: string;
       collectionIdLast: string;
     };

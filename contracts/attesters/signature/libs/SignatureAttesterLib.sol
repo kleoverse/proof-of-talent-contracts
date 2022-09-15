@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.14;
 
-struct IdentityGroupProperties {
+struct SignatureGroupProperties {
   uint128 groupIndex;
   uint32 generationTimestamp;
-  string identityType;
-  string accountId;
-  string username;
+  string badgeType; // identity, credential
+  string source; // github, discord...
+  bytes badgeData;
 }
 
 struct EIP712Signature {
