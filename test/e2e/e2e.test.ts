@@ -226,10 +226,7 @@ describe('Test E2E Protocol', () => {
         [request1, request2],
         [proofRequest1, proofRequest2]
       );
-      const { events } = await tx.wait();
-      const args = getEventArgs(events, 'EarlyUserAttestationGenerated');
-
-      expect(args.destination).to.eql(request1.destination);
+      await tx.wait();
 
       const attestationsValues = await attestationsRegistry.getAttestationValueBatch(
         [
@@ -243,7 +240,7 @@ describe('Test E2E Protocol', () => {
       const expectedAttestationsValues = [
         attestationsRequested1[0].value,
         attestationsRequested2[0].value,
-        BigNumber.from(1),
+        BigNumber.from(0),
       ];
 
       expect(attestationsValues).to.be.eql(expectedAttestationsValues);
@@ -297,10 +294,7 @@ describe('Test E2E Protocol', () => {
         proofRequest1
       );
       await front.generateAttestations(hydraS1SoulboundAttester.address, request2, proofRequest2);
-      const { events } = await tx.wait();
-      const args = getEventArgs(events, 'EarlyUserAttestationGenerated');
-
-      expect(args.destination).to.eql(request1.destination);
+      await tx.wait();
 
       const attestationsValues = await attestationsRegistry.getAttestationValueBatch(
         [
@@ -314,7 +308,7 @@ describe('Test E2E Protocol', () => {
       const expectedAttestationsValues = [
         attestationsRequested1[0].value,
         attestationsRequested2[0].value,
-        BigNumber.from(1),
+        BigNumber.from(0),
       ];
 
       expect(attestationsValues).to.be.eql(expectedAttestationsValues);
