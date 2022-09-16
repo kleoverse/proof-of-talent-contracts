@@ -46,6 +46,12 @@ contract SkillBadge is Initializable, ERC1155, Ownable {
     _transferOwnership(_msgSender());
   }
 
+  /**
+   * @dev Get the skillPoints stored as balance of account for skill id
+   * @param account Address of which skillPoints is to be checked
+   * @param id skill token id for which to get skillPoints
+   * @return SkillPoints of the account for skill id
+   */
   function balanceOf(address account, uint256 id) public view virtual override returns (uint256) {
     uint256 skillPoints;
     for (uint256 i = 0; i < skills[id].credIds.length; i++) {
@@ -65,6 +71,14 @@ contract SkillBadge is Initializable, ERC1155, Ownable {
     return skillPoints;
   }
 
+  /**
+   * @dev Set weights and other cred badge data for a single skill id
+   * @param id skill token id for which to set the data
+   * @param credIds An array of token ids of creds in case of ERC1155 tokens
+   * @param addresses An array of addresses of creds
+   * @param contractTypes An array of token types (ERC721/ERC1155) of creds
+   * @param weights An array of weights of creds for the skill id
+   */
   function setSkillData(
     uint256 id,
     uint256[] memory credIds,
@@ -89,6 +103,13 @@ contract SkillBadge is Initializable, ERC1155, Ownable {
     emit SkillDataSet(id, credIds, addresses, contractTypes, weights);
   }
 
+  /**
+   * @dev Get cred weight for a single skill id
+   * @param id skill token id for which to get the weight
+   * @param _address address of cred
+   * @param credId token ids of cred in case of ERC1155 tokens, 0 in case of ERC721 token
+   * @return Weight of the cred for skill id
+   */
   function getSkillToCredWeight(
     uint256 id,
     address _address,
@@ -97,6 +118,11 @@ contract SkillBadge is Initializable, ERC1155, Ownable {
     return skills[id].contractsToCredsToWeights[_address][credId];
   }
 
+  /**
+   * @dev Get cred data for a single skill id
+   * @param id skill token id for which to get the weight
+   * @return cred data tuple (credIds, addresses, contractTypes) for skill id
+   */
   function getSkillToCredData(uint256 id)
     public
     view

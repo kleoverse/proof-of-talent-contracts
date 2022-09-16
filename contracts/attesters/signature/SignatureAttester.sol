@@ -31,6 +31,7 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
    * @param attestationsRegistryAddress Attestations Registry contract on which the attester will write attestations
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record
    * @param collectionIdLast Id of the last collection in which the attester is supposed to record
+   * @param verifierAddress Address of the off-chain attester signer
    */
   constructor(
     address attestationsRegistryAddress,
@@ -119,9 +120,9 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
 
   /**
    * @dev Hook run before recording the attestation.
-   * Throws if ticket already used and not a renewal (e.g destination different that last)
-   * @param request users request. Claim of having an account part of a group of accounts
-   * @param proofData provided to back the request. snark input and snark proof
+   * Throws if source already used for another destination
+   * @param request users request. Claim of having met the badge requirement
+   * @param proofData provided to back the request.
    */
   function _beforeRecordAttestations(Request calldata request, bytes calldata proofData)
     internal
@@ -143,7 +144,8 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
   *******************************************************/
 
   /**
-   * @dev Getter, returns the last attestation destination of a source
+   * @dev Getter, returns the last attestation's destination of a source
+   * @param attestationId Id of the specific attestation mapped to source
    * @param source address used
    **/
   function getDestinationOfSource(uint256 attestationId, address source)
@@ -155,6 +157,12 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
     return _getDestinationOfSource(attestationId, source);
   }
 
+  /**
+   * @dev Internal Setter, sets the mapping of source-destination for attestationId
+   * @param attestationId Id of the specific attestation mapped to source
+   * @param source address used
+   * @param destination address of the attestation destination
+   **/
   function _setDestinationForSource(
     uint256 attestationId,
     address source,
@@ -164,6 +172,11 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
     emit SourceToDestinationUpdated(attestationId, source, destination);
   }
 
+  /**
+   * @dev Internal Getter, returns the last attestation's destination of a source
+   * @param attestationId Id of the specific attestation mapped to source
+   * @param source address used
+   **/
   function _getDestinationOfSource(uint256 attestationId, address source)
     internal
     view

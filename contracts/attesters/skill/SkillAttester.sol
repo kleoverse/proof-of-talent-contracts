@@ -15,7 +15,7 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
-  IERC1155 SKILL_BADGE;
+  IERC1155 public SKILL_BADGE;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
   /*******************************************************
@@ -26,6 +26,7 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
    * @param attestationsRegistryAddress Attestations Registry contract on which the attester will write attestations
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record
    * @param collectionIdLast Id of the last collection in which the attester is supposed to record
+   * @param skillBadgeAddress Skill Badge contract where the cred to skill weights are stored
    */
   constructor(
     address attestationsRegistryAddress,
@@ -102,9 +103,9 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
 
   /**
    * @dev Hook run before recording the attestation.
-   * Throws if ticket already used and not a renewal (e.g destination different that last)
-   * @param request users request. Claim of having an account part of a group of accounts
-   * @param proofData provided to back the request. snark input and snark proof
+   * Throws if source already used for another destination
+   * @param request users request. Claim of having met the badge requirement
+   * @param proofData provided to back the request.
    */
   function _beforeRecordAttestations(Request calldata request, bytes calldata proofData)
     internal
@@ -122,11 +123,12 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
   }
 
   /*******************************************************
-    Github Attester Specific Functions
+    Skill Attester Specific Functions
   *******************************************************/
 
   /**
-   * @dev Getter, returns the last attestation destination of a source
+   * @dev Getter, returns the last attestation's destination of a source
+   * @param attestationId Id of the specific attestation mapped to source
    * @param source address used
    **/
   function getDestinationOfSource(uint256 attestationId, address source)
@@ -138,6 +140,12 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     return _getDestinationOfSource(attestationId, source);
   }
 
+  /**
+   * @dev Internal Setter, sets the mapping of source-destination for attestationId
+   * @param attestationId Id of the specific attestation mapped to source
+   * @param source address used
+   * @param destination address of the attestation destination
+   **/
   function _setDestinationForSource(
     uint256 attestationId,
     address source,
@@ -147,6 +155,11 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     emit SourceToDestinationUpdated(attestationId, source, destination);
   }
 
+  /**
+   * @dev Internal Getter, returns the last attestation's destination of a source
+   * @param attestationId Id of the specific attestation mapped to source
+   * @param source address used
+   **/
   function _getDestinationOfSource(uint256 attestationId, address source)
     internal
     view
@@ -155,6 +168,10 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     return _sourcesToDestinations[attestationId][source];
   }
 
+  /**
+   * @dev Sets the SKILL_BADGE address
+   * @param skillBadgeAddress Skill Badge contract where the cred to skill weights are stored
+   **/
   function setSkillBadge(address skillBadgeAddress) public onlyOwner {
     SKILL_BADGE = IERC1155(skillBadgeAddress);
   }

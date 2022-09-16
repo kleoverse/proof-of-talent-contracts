@@ -1,20 +1,20 @@
 <br />
 <div align="center">
-  <img src="docs/top.png" alt="Logo" width="100" height="100" style="borderRadius: 20px">
+  <img src="docs/kleoverse-logo.png" alt="Logo" width="100" height="100" style="borderRadius: 20px">
 
   <h3 align="center">
-    Sismo Protocol Contracts
+    Proof of Talent Protocol - Kleoverse
   </h3>
 
   <p align="center">
-    Made by <a href="https://www.sismo.io/" target="_blank">Sismo</a>
+    Built on top of <a href="https://www.sismo.io/" target="_blank">Sismo Protocol</a>
   </p>
   
   <p align="center">
-    <a href="https://discord.gg/sismo" target="_blank">
+    <a href="https://discord.com/invite/u9v97PJVMA" target="_blank">
         <img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white"/>
     </a>
-    <a href="https://twitter.com/sismo_eth" target="_blank">
+    <a href="https://twitter.com/kleoverse" target="_blank">
         <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white"/>
     </a>
   </p>
@@ -23,7 +23,7 @@
   </a>
 </div>
 <br/>
-This repository contains the smart contracts of the Sismo Protocol.
+This repository contains the smart contracts of the Proof Of Talent Protocol. The architecture is forked from Sismo Protocol. We have created new attesters and supporting skill badge contract.
 
 There are three core contracts:
 
@@ -31,6 +31,14 @@ There are three core contracts:
  - `core/Attester.sol` The standard abstract contract must be inherited by attesters. Attesters are issuers of attestations. They verify user requests and build attestations that will be recorded in the registry
  - `core/Badges.sol` Reads the registry. Stateless Non Transferable Token view of attestations (ERC1155)
 
+Proof of talent attesters in `attesters/`:
+- `SignatureAttester.sol`: Signature Attester verify via Ecrecover that the message was correctly signed by the address of the centralized service that verify the claim based on another centralised service API like github, discord
+- `IdentityMerkleAttester.sol`: Identity Merkle Attester issues attestations to users with a userId of identity that's part of an identity accounts merkle tree
+- `SkillAttester.sol`: Skill Attester issues attestations to users with based on skill points fetched from `SkillBadge.sol`
+
+Badges:
+ - `periphery/badges/SkillBadge.sol`: Stores weights for Cred Badges from POT protocol and external ERC721/ERC1155 contracts for different skills to calculate skill points.
+  
 It also contains implementations of attester in `attesters/`:
 - `HydraS1SimpleAttester.sol`: ZK Attester using the [Hydra S1 Proving Scheme](https://hydra-s1.docs.sismo.io) and the notion of tickets (nullifiers). Users must provide a ZK Proof along their request to generate attestations
 - `HydraS1SoulboundAttester.sol`: Soulbound version of the Simple Hydra S1 Simple Attester. (Users can update at will where the attestation is stored)
@@ -38,9 +46,9 @@ It also contains implementations of attester in `attesters/`:
 <br/><br/>
 
 
-## Sismo protocol
+## Proof of Talent protocol - Built on top of Sismo Protocol
 
-A complete overview of the protocol is available in our [documentation](https://protocol.docs.sismo.io)
+A complete overview of the protocol is available in Sismo's [documentation](https://protocol.docs.sismo.io)
 
 
 ## Deployed contracts
@@ -113,8 +121,5 @@ Please, feel free to open issues, PRs or simply provide feedback!
 
 ## Contact
 
-Prefer [Discord](https://discord.gg/sismo) or [Twitter](https://twitter.com/sismo_eth)
-
-<br/>
-<img src="https://static.sismo.io/readme/bottom-main.png" alt="bottom" width="100%" >
+Prefer [Discord](https://discord.com/invite/u9v97PJVMA) or [Twitter](https://twitter.com/kleoverse)
 
