@@ -8,3 +8,4 @@ types/**
 deployments/local
 save
 .env
+.DS_STORE
