@@ -8,8 +8,15 @@ import {IAttestationsRegistry} from '../../core/interfaces/IAttestationsRegistry
 import {IERC1155} from '@openzeppelin/contracts/token/ERC1155/IERC1155.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 
+/**
+ * @title Skill Badge ERC1155 contract
+ * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @notice This is basic read-only-balances ERC1155 NFT contract modified to store weigths for skill vs other erc721/erc1155 tokens.
+ * Balance in this context is the Skill points calculated based on cred badges and weights allocated to them.
+ **/
 contract SkillBadge is Initializable, ERC1155, Ownable {
-  error LengthMismatch(uint256[] credIds, uint32[] weights);
+  error LengthMismatch(string msg);
+  error BadgesNonTransferrable();
 
   event SkillDataSet(
     uint256 indexed id,
@@ -86,7 +93,10 @@ contract SkillBadge is Initializable, ERC1155, Ownable {
     ContractType[] memory contractTypes,
     uint32[] memory weights
   ) public onlyOwner {
-    if (credIds.length != weights.length) revert LengthMismatch(credIds, weights);
+    if (credIds.length != weights.length) revert LengthMismatch('credIds vs weights');
+    if (weights.length != addresses.length) revert LengthMismatch('weights vs addresses');
+    if (addresses.length != contractTypes.length)
+      revert LengthMismatch('addresses vs contractTypes');
 
     for (uint256 i = 0; i < credIds.length; i++) {
       uint256 credId = credIds[i];
@@ -133,5 +143,39 @@ contract SkillBadge is Initializable, ERC1155, Ownable {
     )
   {
     return (skills[id].credIds, skills[id].addresses, skills[id].contractTypes);
+  }
+
+  /**
+   * @dev Reverts, this is a non transferable ERC115 contract
+   */
+  function setApprovalForAll(address operator, bool approved) public virtual override {
+    revert BadgesNonTransferrable();
+  }
+
+  /**
+   * @dev Reverts, this is a non transferable ERC115 contract
+   */
+  function isApprovedForAll(address account, address operator)
+    public
+    view
+    virtual
+    override
+    returns (bool)
+  {
+    revert BadgesNonTransferrable();
+  }
+
+  /**
+   * @dev Reverts, this is a non transferable ERC115 contract
+   */
+  function _beforeTokenTransfer(
+    address operator,
+    address from,
+    address to,
+    uint256[] memory ids,
+    uint256[] memory amounts,
+    bytes memory data
+  ) internal virtual override {
+    revert BadgesNonTransferrable();
   }
 }

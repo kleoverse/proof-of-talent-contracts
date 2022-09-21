@@ -10,6 +10,15 @@ import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.sol';
 import {SkillGroupProperties} from './libs/SkillAttesterLib.sol';
 
+/**
+ * @title  Skill Attester
+ * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @notice This attester uses ERC721/ERC1155 balance to generate attestations.
+ * Skill attester enables users to generate attestations based on amount of tokens based on weights given to those tokens stored in Skill badge contract.
+ * The basic idea to map different ERC721/ERC1155 (including cred badges in attestation registry) to skills with specific weights attached.
+ *
+ * Skill Token amount = Cred Badge[0] * Weight[0] + Cred Badge[1] * Weight[1] + ... + Cred Badge[n] * Weight[n]
+ **/
 contract SkillAttester is ISkillAttester, Attester, Ownable {
   // The deployed contract will need to be authorized to write into the Attestation registry
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.

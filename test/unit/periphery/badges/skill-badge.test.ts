@@ -83,7 +83,40 @@ describe('Test Skill Badge contract', () => {
       ).to.be.revertedWith('Ownable: caller is not the owner');
     });
 
-    it('should set skill data', async () => {
+    it('should revert due mismatch in credIds and weights args length', async () => {
+      const skillId = 0;
+      const tokenIds = [1, 0];
+      const addresses = [mockBadges.address, mockBadges.address, mockERC721.address];
+      const contractType = [1, 1, 0];
+      const weights = [10, 5, 5];
+      await expect(skillBadge.setSkillData(skillId, tokenIds, addresses, contractType, weights))
+        .revertedWithCustomError(skillBadge, 'LengthMismatch')
+        .withArgs('credIds vs weights');
+    });
+
+    it('should revert due mismatch in weights and addresses args length', async () => {
+      const skillId = 0;
+      const tokenIds = [1, 2, 0];
+      const addresses = [mockBadges.address, mockERC721.address];
+      const contractType = [1, 1, 0];
+      const weights = [10, 5, 5];
+      await expect(skillBadge.setSkillData(skillId, tokenIds, addresses, contractType, weights))
+        .revertedWithCustomError(skillBadge, 'LengthMismatch')
+        .withArgs('weights vs addresses');
+    });
+
+    it('should revert due mismatch in addresses and contractTypes args length', async () => {
+      const skillId = 0;
+      const tokenIds = [1, 2, 0];
+      const addresses = [mockBadges.address, mockBadges.address, mockERC721.address];
+      const contractType = [1, 0];
+      const weights = [10, 5, 5];
+      await expect(skillBadge.setSkillData(skillId, tokenIds, addresses, contractType, weights))
+        .revertedWithCustomError(skillBadge, 'LengthMismatch')
+        .withArgs('addresses vs contractTypes');
+    });
+
+    it('should set skill data for first skill', async () => {
       const skillId = 0;
       const tokenIds = [1, 2, 0];
       const addresses = [mockBadges.address, mockBadges.address, mockERC721.address];
@@ -96,6 +129,19 @@ describe('Test Skill Badge contract', () => {
       expect(await skillBadge.getSkillToCredWeight(0, mockBadges.address, 2)).to.equal(5);
       expect(await skillBadge.getSkillToCredWeight(0, mockERC721.address, 0)).to.equal(5);
     });
+
+    it('should set skill data for second skill', async () => {
+      const skillId = 1;
+      const tokenIds = [1, 0];
+      const addresses = [mockBadges.address, mockERC721.address];
+      const contractType = [1, 0];
+      const weights = [10, 5];
+      await expect(skillBadge.setSkillData(skillId, tokenIds, addresses, contractType, weights))
+        .emit(skillBadge, 'SkillDataSet')
+        .withArgs(skillId, tokenIds, addresses, contractType, weights);
+      expect(await skillBadge.getSkillToCredWeight(1, mockBadges.address, 1)).to.equal(10);
+      expect(await skillBadge.getSkillToCredWeight(1, mockERC721.address, 0)).to.equal(5);
+    });
   });
 
   /*************************************************************************************/
@@ -104,6 +150,13 @@ describe('Test Skill Badge contract', () => {
   describe('Skill data getter', () => {
     it('should get skill balance', async () => {
       expect(await skillBadge.balanceOf(user.address, 0)).to.equal(40);
+      expect(await skillBadge.balanceOf(user.address, 1)).to.equal(30);
+    });
+
+    it('should get skill balance in batch', async () => {
+      expect(await skillBadge.balanceOfBatch([user.address, user.address], [0, 1])).to.deep.equal([
+        40, 30,
+      ]);
     });
 
     it('should get cred data of skill', async () => {
