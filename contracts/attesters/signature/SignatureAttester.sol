@@ -10,6 +10,12 @@ import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.sol';
 import {SignatureGroupProperties, EIP712Signature} from './libs/SignatureAttesterLib.sol';
 
+/**
+ * @title  Signature Attester
+ * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @notice This attester is based on ECDSA signature verfication method.
+ * Signature attester enables users to generate attestations based on signature signed using ECDSA scheme off-chain by a centralised verifier.
+ **/
 contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
   bytes32 private constant _ATTESTATION_REQUEST_TYPEHASH =
     keccak256(

@@ -11,6 +11,13 @@ import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.
 import {IdentityMerkleGroupProperties, IdentityGroupProperties, IdentityBadgeData, MerkleProofData} from './libs/IdentityMerkleAttesterLib.sol';
 import {IAvailableRootsRegistry} from '../../periphery/utils/AvailableRootsRegistry.sol';
 
+/**
+ * @title  Identity Merkle Attester
+ * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @notice This attester is for merkle based data.
+ * Identity Merkle attester enables users to generate attestations based on data collected from off-chain data source having identity authentication.
+ * It uses Identity Badge generated using Signature Attester or similar attester to authenticate the user for data in merkle tree.
+ **/
 contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
   // The deployed contract will need to be authorized to write into the Attestation registry
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
