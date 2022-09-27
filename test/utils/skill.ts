@@ -1,6 +1,4 @@
 import { BigNumber, ethers } from 'ethers';
-import { v4 as uuidv4 } from 'uuid';
-import randomstring from 'randomstring';
 
 /*************************************************/
 /**************    MOCK ACCOUNTS     *************/
@@ -46,7 +44,9 @@ export type SkillGroup = {
 export type SkillGroupProperties = {
   groupIndex: number;
   generationTimestamp: number;
-  skill: string;
+  badgeType: string; // identity, credential
+  source: string; // github, discord, other...
+  badgeData: string; // bytes extra badge data
 };
 
 export type SkillAttesterGroups = {
@@ -65,7 +65,9 @@ export const generateSkillAttesterGroups = async (
     const properties = {
       groupIndex: i,
       generationTimestamp,
-      skill: randomstring.generate(),
+      badgeType: 'skill',
+      source: 'other',
+      badgeData: '0x',
     };
 
     groups.push({
@@ -83,7 +85,15 @@ export const generateSkillAttesterGroups = async (
 
 export const encodeSkillGroupProperties = (groupProperties: SkillGroupProperties): string => {
   return ethers.utils.defaultAbiCoder.encode(
-    ['uint128', 'uint32', 'string'],
-    [groupProperties.groupIndex, groupProperties.generationTimestamp, groupProperties.skill]
+    ['tuple(uint128,uint32,string,string,bytes)'],
+    [
+      [
+        groupProperties.groupIndex,
+        groupProperties.generationTimestamp,
+        groupProperties.badgeType,
+        groupProperties.source,
+        groupProperties.badgeData,
+      ],
+    ]
   );
 };

@@ -149,7 +149,6 @@ describe('Test Skill attester contract', () => {
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(30);
-      expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
       expect(args.attestation.extraData).to.equal(request.claims[0].extraData);
     });
 
@@ -173,7 +172,6 @@ describe('Test Skill attester contract', () => {
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(30);
-      expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
       expect(args.attestation.extraData).to.equal(request.claims[0].extraData);
     });
   });

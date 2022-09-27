@@ -8,7 +8,6 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import {ISkillAttester} from './interfaces/ISkillAttester.sol';
 import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.sol';
-import {SkillGroupProperties} from './libs/SkillAttesterLib.sol';
 
 /**
  * @title  Skill Attester
@@ -81,10 +80,6 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     returns (Attestation[] memory)
   {
     Claim memory claim = request.claims[0];
-    SkillGroupProperties memory groupProperties = abi.decode(
-      claim.extraData,
-      (SkillGroupProperties)
-    );
 
     Attestation[] memory attestations = new Attestation[](1);
 
@@ -100,7 +95,7 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
       request.destination,
       issuer,
       claim.claimedValue,
-      groupProperties.generationTimestamp,
+      uint32(block.timestamp),
       claim.extraData
     );
     return (attestations);

@@ -8,7 +8,7 @@ import '@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol';
 import {ISignatureAttester} from './interfaces/ISignatureAttester.sol';
 import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.sol';
-import {SignatureGroupProperties, EIP712Signature} from './libs/SignatureAttesterLib.sol';
+import {EIP712Signature} from './libs/SignatureAttesterLib.sol';
 
 /**
  * @title  Signature Attester
