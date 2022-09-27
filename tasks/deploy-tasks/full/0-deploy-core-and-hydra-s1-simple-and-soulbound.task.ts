@@ -350,7 +350,7 @@ async function deploymentAction(
     
     * Skill Badge
       -> proxy: ${(await hre.deployments.all()).SkillBadge.address}
-      -> implem: ${(await hre.deployments.all()).SkillBadge.address}
+      -> implem: ${(await hre.deployments.all()).SkillBadgeImplem.address}
       uri: ${config.skillBadge.uri}
 
     * HydraS1SimpleAttester:
@@ -370,19 +370,19 @@ async function deploymentAction(
 
     * SignatureAttester:
       -> proxy: ${(await hre.deployments.all()).SignatureAttester.address}
-      -> implem: ${(await hre.deployments.all()).SignatureAttester.address}
+      -> implem: ${(await hre.deployments.all()).SignatureAttesterImplem.address}
       collectionIdFirst: ${config.signatureAttester.collectionIdFirst}
       collectionIdLast: ${config.signatureAttester.collectionIdLast}
 
     * IdentityMerkleAttester:
       -> proxy: ${(await hre.deployments.all()).IdentityMerkleAttester.address}
-      -> implem: ${(await hre.deployments.all()).IdentityMerkleAttester.address}
+      -> implem: ${(await hre.deployments.all()).IdentityMerkleAttesterImplem.address}
       collectionIdFirst: ${config.identityMerkleAttester.collectionIdFirst}
       collectionIdLast: ${config.identityMerkleAttester.collectionIdLast}
 
     * SkillAttester:
       -> proxy: ${(await hre.deployments.all()).SkillAttester.address}
-      -> implem: ${(await hre.deployments.all()).SkillAttester.address}
+      -> implem: ${(await hre.deployments.all()).SkillAttesterImplem.address}
       collectionIdFirst: ${config.skillAttester.collectionIdFirst}
       collectionIdLast: ${config.skillAttester.collectionIdLast}
     

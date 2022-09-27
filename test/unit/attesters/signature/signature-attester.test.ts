@@ -1,7 +1,12 @@
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
-import { AttestationsRegistry, Badges, SignatureAttester } from 'types';
+import {
+  AttestationsRegistry,
+  Badges,
+  SignatureAttester,
+  TransparentUpgradeableProxy__factory,
+} from '../../../../types';
 import { RequestStruct } from 'types/Attester';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -21,6 +26,7 @@ import {
 } from '../../../utils';
 import { getEventArgs } from '../../../utils/expectEvent';
 import { getAddress } from 'ethers/lib/utils';
+import { getImplementation } from '../../../../utils';
 
 const config = deploymentsConfig[hre.network.name];
 const collectionIdFirst = BigNumber.from(config.signatureAttester.collectionIdFirst);
@@ -435,6 +441,38 @@ describe('Test Signature attester contract', () => {
       await expect(signatureAttester.generateAttestations(wrongRequest, data))
         .to.be.revertedWithCustomError(signatureAttester, `SourceAlreadyUsed`)
         .withArgs(deployer.address);
+    });
+  });
+
+  /*************************************************************************************/
+  /******************************* UPDATE IMPLEMENTATION *******************************/
+  /*************************************************************************************/
+  describe('Update implementation', () => {
+    it('Should update the implementation', async () => {
+      const proxyAdminSigner = await ethers.getSigner(
+        deploymentsConfig[hre.network.name].deployOptions.proxyAdmin as string
+      );
+
+      const { signatureAttester: newSignatureAttester } = await hre.run(
+        'deploy-signature-attester',
+        {
+          collectionIdFirst: config.signatureAttester.collectionIdFirst,
+          collectionIdLast: config.signatureAttester.collectionIdLast,
+          attestationsRegistryAddress: attestationsRegistry.address,
+          verifierAddress: config.signatureAttester.verifierAddress,
+          options: { behindProxy: false },
+        }
+      );
+
+      const signatureAttesterProxy = TransparentUpgradeableProxy__factory.connect(
+        signatureAttester.address,
+        proxyAdminSigner
+      );
+
+      await (await signatureAttesterProxy.upgradeTo(newSignatureAttester.address)).wait();
+
+      const implementationAddress = await getImplementation(signatureAttesterProxy);
+      expect(implementationAddress).to.eql(newSignatureAttester.address);
     });
   });
 });

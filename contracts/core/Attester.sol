@@ -6,9 +6,9 @@ import {Request, Attestation, AttestationData} from './libs/Structs.sol';
 
 /**
  * @title Attester Abstract Contract
- * @author Sismo
+ * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
  * @notice Contract to be inherited by Attesters
- * All attesters that expect to be authorized in Sismo Protocol (i.e write access on the registry)
+ * All attesters that expect to be authorized in Proof of Talent Protocol (i.e write access on the registry)
  * are recommended to implemented this abstract contract
 
  * Take a look at the HydraS1SimpleAttester.sol for example on how to implement this abstract contract

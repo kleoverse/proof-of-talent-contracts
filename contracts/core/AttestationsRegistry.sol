@@ -10,11 +10,10 @@ import {IBadges} from './interfaces/IBadges.sol';
 
 /**
  * @title Attestations Registry
- * @author Sismo
- * @notice Main contract of Sismo, stores all recorded attestations in attestations collections
+ * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
+ * @notice Main contract of Proof of Talent Protocol, stores all recorded attestations in attestations collections
  * Only authorized attestations issuers can record attestation in the registry
  * Attesters that expect to record in the Attestations Registry must be authorized issuers
- * For more information: https://attestations-registry.docs.sismo.io
 
  * For each attestation recorded, a badge is received by the user
  * The badge is the Non transferrable NFT representation of an attestation 

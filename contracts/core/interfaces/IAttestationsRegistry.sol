@@ -5,7 +5,7 @@ import {Attestation, AttestationData} from '../libs/Structs.sol';
 
 /**
  * @title IAttestationsRegistry
- * @author Sismo
+ * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
  * @notice This is the interface of the AttestationRegistry
  */
 interface IAttestationsRegistry {

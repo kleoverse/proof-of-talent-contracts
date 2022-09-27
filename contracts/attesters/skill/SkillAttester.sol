@@ -24,7 +24,7 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
-  IERC1155 public SKILL_BADGE;
+  IERC1155 public immutable SKILL_BADGE;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
   /*******************************************************
@@ -175,13 +175,5 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     returns (address)
   {
     return _sourcesToDestinations[attestationId][source];
-  }
-
-  /**
-   * @dev Sets the SKILL_BADGE address
-   * @param skillBadgeAddress Skill Badge contract where the cred to skill weights are stored
-   **/
-  function setSkillBadge(address skillBadgeAddress) public onlyOwner {
-    SKILL_BADGE = IERC1155(skillBadgeAddress);
   }
 }

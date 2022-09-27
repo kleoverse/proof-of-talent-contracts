@@ -45,7 +45,6 @@ describe('Test E2E Protocol', () => {
   let commitmentMapperRegistry: CommitmentMapperRegistry;
   let front: Front;
   let badges: Badges;
-  let earlyUserCollectionId;
 
   // hydra s1 prover
   let prover: HydraS1Prover;
@@ -123,7 +122,7 @@ describe('Test E2E Protocol', () => {
 
   describe('Deployments, setup contracts and prepare test requests', () => {
     it('Should deploy and setup core', async () => {
-      // Deploy Sismo Protocol Core contracts
+      // Deploy Proof of Talent Protocol Core contracts
 
       ({
         attestationsRegistry,
@@ -145,10 +144,9 @@ describe('Test E2E Protocol', () => {
       await (
         await availableRootsRegistry.registerRootForAttester(hydraS1SoulboundAttester.address, root)
       ).wait();
-      earlyUserCollectionId = await front.EARLY_USER_COLLECTION();
     });
     it('Should prepare test requests', async () => {
-      // Deploy Sismo Protocol Core contracts
+      // Deploy Proof of Talent Protocol Core contracts
       ticketIdentifier1 = await generateTicketIdentifier(
         hydraS1SimpleAttester.address,
         group1.properties.groupIndex
@@ -229,29 +227,20 @@ describe('Test E2E Protocol', () => {
       await tx.wait();
 
       const attestationsValues = await attestationsRegistry.getAttestationValueBatch(
-        [
-          attestationsRequested1[0].collectionId,
-          attestationsRequested2[0].collectionId,
-          earlyUserCollectionId,
-        ],
-        [request1.destination, request2.destination, request1.destination]
+        [attestationsRequested1[0].collectionId, attestationsRequested2[0].collectionId],
+        [request1.destination, request2.destination]
       );
 
       const expectedAttestationsValues = [
         attestationsRequested1[0].value,
         attestationsRequested2[0].value,
-        BigNumber.from(0),
       ];
 
       expect(attestationsValues).to.be.eql(expectedAttestationsValues);
 
       const balances = await badges.balanceOfBatch(
-        [request1.destination, request2.destination, request1.destination],
-        [
-          attestationsRequested1[0].collectionId,
-          attestationsRequested2[0].collectionId,
-          earlyUserCollectionId,
-        ]
+        [request1.destination, request2.destination],
+        [attestationsRequested1[0].collectionId, attestationsRequested2[0].collectionId]
       );
 
       const expectedBalances = expectedAttestationsValues;
@@ -262,25 +251,17 @@ describe('Test E2E Protocol', () => {
       await evmRevert(hre, snapshotId);
 
       const attestationsValues = await attestationsRegistry.getAttestationValueBatch(
-        [
-          attestationsRequested1[0].collectionId,
-          attestationsRequested2[0].collectionId,
-          earlyUserCollectionId,
-        ],
-        [request1.destination, request2.destination, request1.destination]
+        [attestationsRequested1[0].collectionId, attestationsRequested2[0].collectionId],
+        [request1.destination, request2.destination]
       );
 
-      const expectedAttestationsValues = [BigNumber.from(0), BigNumber.from(0), BigNumber.from(0)];
+      const expectedAttestationsValues = [BigNumber.from(0), BigNumber.from(0)];
 
       expect(attestationsValues).to.be.eql(expectedAttestationsValues);
 
       const balances = await badges.balanceOfBatch(
-        [request1.destination, request2.destination, request1.destination],
-        [
-          attestationsRequested1[0].collectionId,
-          attestationsRequested2[0].collectionId,
-          earlyUserCollectionId,
-        ]
+        [request1.destination, request2.destination],
+        [attestationsRequested1[0].collectionId, attestationsRequested2[0].collectionId]
       );
 
       const expectedBalances = expectedAttestationsValues;
@@ -297,29 +278,20 @@ describe('Test E2E Protocol', () => {
       await tx.wait();
 
       const attestationsValues = await attestationsRegistry.getAttestationValueBatch(
-        [
-          attestationsRequested1[0].collectionId,
-          attestationsRequested2[0].collectionId,
-          earlyUserCollectionId,
-        ],
-        [request1.destination, request2.destination, request1.destination]
+        [attestationsRequested1[0].collectionId, attestationsRequested2[0].collectionId],
+        [request1.destination, request2.destination]
       );
 
       const expectedAttestationsValues = [
         attestationsRequested1[0].value,
         attestationsRequested2[0].value,
-        BigNumber.from(0),
       ];
 
       expect(attestationsValues).to.be.eql(expectedAttestationsValues);
 
       const balances = await badges.balanceOfBatch(
-        [request1.destination, request2.destination, request1.destination],
-        [
-          attestationsRequested1[0].collectionId,
-          attestationsRequested2[0].collectionId,
-          earlyUserCollectionId,
-        ]
+        [request1.destination, request2.destination],
+        [attestationsRequested1[0].collectionId, attestationsRequested2[0].collectionId]
       );
 
       const expectedBalances = expectedAttestationsValues;

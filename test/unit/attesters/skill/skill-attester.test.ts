@@ -1,6 +1,11 @@
 import { expect } from 'chai';
-import hre from 'hardhat';
-import { AttestationsRegistry, Badges, MockSkillBadge, SkillAttester } from 'types';
+import hre, { ethers } from 'hardhat';
+import {
+  AttestationsRegistry,
+  MockSkillBadge,
+  SkillAttester,
+  TransparentUpgradeableProxy__factory,
+} from '../../../../types';
 import { RequestStruct } from 'types/Attester';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -20,6 +25,8 @@ import {
   DeployedMockSkillBadge,
   DeployMockSkillBadgeArgs,
 } from 'tasks/deploy-tasks/tests/deploy-mock-skill-badge.task';
+import { getImplementation } from '../../../../utils';
+import { getCommonOptions } from '../../../../tasks/utils/common-options';
 
 const config = deploymentsConfig[hre.network.name];
 const collectionIdFirst = BigNumber.from(config.skillAttester.collectionIdFirst);
@@ -29,9 +36,11 @@ describe('Test Skill attester contract', () => {
   // contracts
   let skillAttester: SkillAttester;
   let mockSkillBadge: MockSkillBadge;
+  let attestationsRegistry: AttestationsRegistry;
 
   // Test Signers
   let deployer: SignerWithAddress;
+  let secondDeployer: SignerWithAddress;
   let randomSigner: SignerWithAddress;
   let proxyAdminSigner: SignerWithAddress;
   let attesterOracle: SignerWithAddress;
@@ -53,8 +62,15 @@ describe('Test Skill attester contract', () => {
 
   before(async () => {
     const signers = await hre.ethers.getSigners();
-    [deployer, randomSigner, proxyAdminSigner, attesterOracle, mockAttestationsRegistry, notAdmin] =
-      signers;
+    [
+      deployer,
+      randomSigner,
+      proxyAdminSigner,
+      attesterOracle,
+      mockAttestationsRegistry,
+      notAdmin,
+      secondDeployer,
+    ] = signers;
 
     let accounts: SkillAccountData[] = await generateSkillAccounts(signers);
 
@@ -86,10 +102,25 @@ describe('Test Skill attester contract', () => {
         },
       } as DeployMockSkillBadgeArgs)) as DeployedMockSkillBadge);
 
-      ({ skillAttester } = (await hre.run('0-deploy-core-and-hydra-s1-simple-and-soulbound', {
-        options: { log: false },
-      })) as Deployed0);
-      await skillAttester.setSkillBadge(mockSkillBadge.address);
+      ({ attestationsRegistry } = (await hre.run(
+        '0-deploy-core-and-hydra-s1-simple-and-soulbound',
+        {
+          options: { log: false },
+        }
+      )) as Deployed0);
+      ({ skillAttester } = await hre.run('deploy-skill-attester', {
+        collectionIdFirst: config.skillAttester.collectionIdFirst,
+        collectionIdLast: config.skillAttester.collectionIdLast,
+        attestationsRegistryAddress: attestationsRegistry.address,
+        skillBadgeAddress: mockSkillBadge.address,
+      }));
+      await hre.run('attestations-registry-authorize-range', {
+        attestationsRegistryAddress: attestationsRegistry.address,
+        attesterAddress: skillAttester.address,
+        collectionIdFirst: config.skillAttester.collectionIdFirst,
+        collectionIdLast: config.skillAttester.collectionIdLast,
+        options: getCommonOptions({ log: false }),
+      });
     });
   });
 
@@ -224,14 +255,31 @@ describe('Test Skill attester contract', () => {
   });
 
   /*************************************************************************************/
-  /************************** Test onlyOwner functions *********************************/
+  /******************************* UPDATE IMPLEMENTATION *******************************/
   /*************************************************************************************/
+  describe('Update implementation', () => {
+    it('Should update the implementation', async () => {
+      const proxyAdminSigner = await ethers.getSigner(
+        deploymentsConfig[hre.network.name].deployOptions.proxyAdmin as string
+      );
 
-  describe('Before record attestation', () => {
-    it('Should revert due to caller not being the admin', async () => {
-      await expect(
-        skillAttester.connect(notAdmin).setSkillBadge(randomSigner.address)
-      ).to.be.rejectedWith('Ownable: caller is not the owner');
+      const { skillAttester: newSkillAttester } = await hre.run('deploy-skill-attester', {
+        collectionIdFirst: config.skillAttester.collectionIdFirst,
+        collectionIdLast: config.skillAttester.collectionIdLast,
+        attestationsRegistryAddress: attestationsRegistry.address,
+        skillBadgeAddress: mockSkillBadge.address,
+        options: { behindProxy: false },
+      });
+
+      const skillAttesterProxy = TransparentUpgradeableProxy__factory.connect(
+        skillAttester.address,
+        proxyAdminSigner
+      );
+
+      await (await skillAttesterProxy.upgradeTo(newSkillAttester.address)).wait();
+
+      const implementationAddress = await getImplementation(skillAttesterProxy);
+      expect(implementationAddress).to.eql(newSkillAttester.address);
     });
   });
 });

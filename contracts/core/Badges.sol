@@ -10,7 +10,7 @@ import {IBadges} from './interfaces/IBadges.sol';
 
 /**
  * @title Badges contract
- * @author Sismo
+ * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
  * @notice Stateless, Non-transferrable ERC1155 contract. Reads balance from the values of attestations
  * The associated attestations registry triggers TransferSingle events from this contract
  * It allows badge "shadow mints and burns" to be caught by off-chain platforms
@@ -28,7 +28,7 @@ contract Badges is IBadges, Initializable, AccessControl, ERC1155 {
    */
   constructor(
     string memory uri,
-    address owner // This is Sismo Frontend Contract
+    address owner // This is Proof of Talent Frontend Contract
   ) ERC1155(uri) {
     initialize(uri, owner);
   }

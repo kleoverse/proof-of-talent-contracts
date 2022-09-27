@@ -38,10 +38,6 @@ Proof of talent attesters in `attesters/`:
 
 Badges:
  - `periphery/badges/SkillBadge.sol`: Stores weights for Cred Badges from POT protocol and external ERC721/ERC1155 contracts for different skills to calculate skill points.
-  
-It also contains implementations of attester in `attesters/`:
-- `HydraS1SimpleAttester.sol`: ZK Attester using the [Hydra S1 Proving Scheme](https://hydra-s1.docs.sismo.io) and the notion of tickets (nullifiers). Users must provide a ZK Proof along their request to generate attestations
-- `HydraS1SoulboundAttester.sol`: Soulbound version of the Simple Hydra S1 Simple Attester. (Users can update at will where the attestation is stored)
 
 <br/><br/>
 
@@ -53,7 +49,7 @@ A complete overview of the protocol is available in Sismo's [documentation](http
 
 ## Deployed contracts
 
-Deployed contracts can be found [here](https://docs.sismo.io/sismo-docs/deployed-contract-addresses)
+Deployed contracts can be found [here](https://www.notion.so/kleoverse/Deployed-contracts-db7ff241ec6147e9a26db4c0f824ebaf)
 
 
 ## Usage
@@ -107,7 +103,7 @@ There are other optional hook functions that can be implemented:
 
 The `/attesters/hydra-s1/HydraS1SimpleAttester.sol` is a good example of an attester implementing those functions.
 
-A [guide](https://attesters.docs.sismo.io) is offered in our documentation.
+A [guide](https://attesters.docs.sismo.io) is offered in Sismo's documentation.
 
 Feel free open a PR with your new attester in `/attester`!
 

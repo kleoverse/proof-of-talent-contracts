@@ -13,7 +13,7 @@ import {Range, RangeUtils} from '../utils/RangeLib.sol';
 
 /**
  * @title Attestations Registry Config Logic contract
- * @author Sismo
+ * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
  * @notice Holds the logic of how to authorize/ unauthorize issuers of attestations in the registry
  **/
 contract AttestationsRegistryConfigLogic is

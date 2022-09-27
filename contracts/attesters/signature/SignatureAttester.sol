@@ -26,7 +26,7 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
-  address internal _verifierAddress;
+  address public immutable VERIFIER;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
   /*******************************************************
@@ -47,7 +47,7 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
   ) Attester(attestationsRegistryAddress) EIP712('SignatureAttester', '1') {
     AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
     AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
-    _verifierAddress = verifierAddress;
+    VERIFIER = verifierAddress;
   }
 
   /*******************************************************
@@ -82,8 +82,8 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
     bytes32 hash = _hashTypedDataV4(structHash);
 
     address signer = ECDSA.recover(hash, sig.v, sig.r, sig.s);
-    if (signer != _verifierAddress) {
-      revert SignatureInvalid(_verifierAddress, signer);
+    if (signer != VERIFIER) {
+      revert SignatureInvalid(VERIFIER, signer);
     }
   }
 
