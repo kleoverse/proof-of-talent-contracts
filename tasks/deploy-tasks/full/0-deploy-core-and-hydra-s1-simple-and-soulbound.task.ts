@@ -376,7 +376,7 @@ async function deploymentAction(
 
     * IdentityMerkleAttester:
       -> proxy: ${(await hre.deployments.all()).IdentityMerkleAttester.address}
-      -> implem: ${(await hre.deployments.all()).IdentityMerkleAttesterImplem.address}
+      -> implem: ${(await hre.deployments.all()).IdentityMerkleAttester.address}
       collectionIdFirst: ${config.identityMerkleAttester.collectionIdFirst}
       collectionIdLast: ${config.identityMerkleAttester.collectionIdLast}
 
