@@ -11,6 +11,7 @@ interface IIdentityMerkleAttester {
   error IdentityInvalid();
   error BadgeInvalid();
   error CollectionIdOutOfBound(uint256 collectionId);
+  error NotAttestationOwner(uint256 collectionId, address sender);
 
   event SourceToDestinationUpdated(uint256 attestationId, address source, address destination);
 

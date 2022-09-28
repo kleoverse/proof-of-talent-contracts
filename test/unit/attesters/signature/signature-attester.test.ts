@@ -181,7 +181,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group2.properties),
           },
         ],
-        destination: destination2.account,
+        destination: destination1.account,
       };
 
       const signData = generateEIP712TypedSignData(
@@ -201,7 +201,7 @@ describe('Test Signature attester contract', () => {
       const args = getEventArgs(events, 'AttestationGenerated');
 
       expect(args.attestation.issuer).to.equal(signatureAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination2.account).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(1));
       expect(args.attestation.value).to.equal(1);
     });
@@ -441,6 +441,46 @@ describe('Test Signature attester contract', () => {
       await expect(signatureAttester.generateAttestations(wrongRequest, data))
         .to.be.revertedWithCustomError(signatureAttester, `SourceAlreadyUsed`)
         .withArgs(deployer.address);
+    });
+  });
+
+  /*************************************************************************************/
+  /***************************** Delete ATTESTATION ****************************/
+  /*************************************************************************************/
+
+  describe('Delete attestation', () => {
+    it('Should revert delete attestation', async () => {
+      await expect(
+        signatureAttester.deleteAttestations(
+          [collectionIdFirst.add(0), collectionIdFirst.add(1)],
+          destination1.account,
+          '0x'
+        )
+      )
+        .to.be.revertedWithCustomError(signatureAttester, 'NotAttestationOwner')
+        .withArgs(collectionIdFirst.add(0), deployer.address);
+    });
+    it('Should delete attestation', async () => {
+      const tx = await signatureAttester
+        .connect(await ethers.getSigner(destination1.account))
+        .deleteAttestations(
+          [collectionIdFirst.add(0), collectionIdFirst.add(1)],
+          destination1.account,
+          '0x'
+        );
+      const { events } = await tx.wait();
+      const args = getEventArgs(events, 'AttestationDeleted', 6);
+      const args2 = getEventArgs(events, 'AttestationDeleted', 7);
+
+      expect(args.attestation.issuer).to.equal(signatureAttester.address);
+      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
+      expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
+      expect(args.attestation.value).to.equal(2);
+
+      expect(args2.attestation.issuer).to.equal(signatureAttester.address);
+      expect(args2.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
+      expect(args2.attestation.collectionId).to.equal(collectionIdFirst.add(1));
+      expect(args2.attestation.value).to.equal(1);
     });
   });
 

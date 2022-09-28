@@ -69,6 +69,21 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
   }
 
   /**
+   * @dev Throws if user attestations deletion request is not made by its owner
+   * @param attestations attestations to delete
+   */
+  function _verifyAttestationsDeletionRequest(Attestation[] memory attestations, bytes calldata)
+    internal
+    view
+    override
+  {
+    for (uint256 i = 0; i < attestations.length; i++) {
+      if (attestations[i].owner != msg.sender)
+        revert NotAttestationOwner(attestations[i].collectionId, msg.sender);
+    }
+  }
+
+  /**
    * @dev Returns attestations that will be recorded, constructed from the user request
    * @param request users request. Claim of having met the badge requirement
    */
@@ -124,6 +139,21 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     }
 
     _setDestinationForSource(attestationCollectionId, msg.sender, request.destination);
+  }
+
+  /**
+   * @dev Hook run before deleting the attestations.
+   * Unsets destination for the source and collectionId
+   * @param attestations Attestations that will be deleted
+   * @param proofData Data sent along the request to prove its validity
+   */
+  function _beforeDeleteAttestations(Attestation[] memory attestations, bytes calldata proofData)
+    internal
+    override
+  {
+    for (uint256 i = 0; i < attestations.length; i++) {
+      _setDestinationForSource(attestations[i].collectionId, msg.sender, address(0));
+    }
   }
 
   /*******************************************************

@@ -83,9 +83,9 @@ abstract contract Attester is IAttester {
     bytes calldata proofData
   ) external override returns (Attestation[] memory) {
     // fetch attestations from the registry
-    address[] memory attestationOwners;
-    uint256[] memory attestationCollectionIds;
-    Attestation[] memory attestationsToDelete;
+    address[] memory attestationOwners = new address[](collectionIds.length);
+    uint256[] memory attestationCollectionIds = new uint256[](collectionIds.length);
+    Attestation[] memory attestationsToDelete = new Attestation[](collectionIds.length);
     for (uint256 i = 0; i < collectionIds.length; i++) {
       (
         address issuer,

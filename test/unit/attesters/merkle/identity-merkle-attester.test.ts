@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import hre from 'hardhat';
+import hre, { ethers } from 'hardhat';
 import {
   AttestationsRegistry,
   AvailableRootsRegistry,
@@ -10,7 +10,7 @@ import {
 import { RequestStruct } from 'types/Attester';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, ethers, utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { Deployed0 } from 'tasks/deploy-tasks/full/0-deploy-core-and-hydra-s1-simple-and-soulbound.task';
 import { deploymentsConfig } from '../../../../tasks/deploy-tasks/deployments-config';
 import {
@@ -261,7 +261,7 @@ describe('Test Identity Merkle attester contract', () => {
       expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
-      expect(args.attestation.value).to.equal(0);
+      expect(args.attestation.value).to.equal(1);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
     });
 
@@ -290,7 +290,7 @@ describe('Test Identity Merkle attester contract', () => {
       expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
       expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
-      expect(args.attestation.value).to.equal(0);
+      expect(args.attestation.value).to.equal(1);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
     });
   });
@@ -455,6 +455,47 @@ describe('Test Identity Merkle attester contract', () => {
       await expect(identityMerkleAttester.generateAttestations(request, data))
         .to.be.revertedWithCustomError(identityMerkleAttester, `SourceAlreadyUsed`)
         .withArgs(deployer.address);
+    });
+  });
+
+  /*************************************************************************************/
+  /***************************** Delete ATTESTATION ****************************/
+  /*************************************************************************************/
+
+  describe('Delete attestation', () => {
+    it('Should revert delete attestation', async () => {
+      await expect(
+        identityMerkleAttester.deleteAttestations(
+          [collectionIdFirst.add(0), collectionIdFirst.add(1)],
+          destination1.address,
+          '0x'
+        )
+      )
+        .to.be.revertedWithCustomError(identityMerkleAttester, 'NotAttestationOwner')
+        .withArgs(collectionIdFirst.add(0), deployer.address);
+    });
+    it('Should delete attestation', async () => {
+      const tx = await identityMerkleAttester
+        .connect(await ethers.getSigner(destination1.address))
+        .deleteAttestations(
+          [collectionIdFirst.add(0), collectionIdFirst.add(1)],
+          destination1.address,
+          '0x'
+        );
+      const { events } = await tx.wait();
+      const args = getEventArgs(events, 'AttestationDeleted', 6);
+      const args2 = getEventArgs(events, 'AttestationDeleted', 7);
+
+      expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
+      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
+      expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
+      expect(args.attestation.value).to.equal(1);
+
+      // Empty burn, no attestation was present to begin with
+      expect(args2.attestation.issuer).to.equal(ethers.constants.AddressZero);
+      expect(args2.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
+      expect(args2.attestation.collectionId).to.equal(collectionIdFirst.add(1));
+      expect(args2.attestation.value).to.equal(0);
     });
   });
 });
