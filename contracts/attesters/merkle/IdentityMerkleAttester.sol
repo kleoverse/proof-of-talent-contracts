@@ -89,6 +89,8 @@ contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
     for (uint256 i = 0; i < attestations.length; i++) {
       if (attestations[i].owner != msg.sender)
         revert NotAttestationOwner(attestations[i].collectionId, msg.sender);
+      address destination = _getDestinationOfSource(attestations[i].collectionId, msg.sender);
+      if (destination != msg.sender) revert SourceDestinationNotSame(msg.sender, destination);
     }
   }
 
@@ -144,7 +146,12 @@ contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
     virtual
     override
   {
-    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + request.claims[0].groupId;
+    Claim memory claim = request.claims[0];
+    IdentityMerkleGroupProperties memory groupProperties = abi.decode(
+      claim.extraData,
+      (IdentityMerkleGroupProperties)
+    );
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + groupProperties.groupIndex;
     address currentDestination = _getDestinationOfSource(attestationCollectionId, msg.sender);
 
     if (currentDestination != address(0) && currentDestination != request.destination) {

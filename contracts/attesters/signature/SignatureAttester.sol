@@ -99,6 +99,8 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
     for (uint256 i = 0; i < attestations.length; i++) {
       if (attestations[i].owner != msg.sender)
         revert NotAttestationOwner(attestations[i].collectionId, msg.sender);
+      address destination = _getDestinationOfSource(attestations[i].collectionId, msg.sender);
+      if (destination != msg.sender) revert SourceDestinationNotSame(msg.sender, destination);
     }
   }
 

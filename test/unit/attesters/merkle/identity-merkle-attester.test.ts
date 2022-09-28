@@ -245,7 +245,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -259,7 +259,7 @@ describe('Test Identity Merkle attester contract', () => {
       const args = getEventArgs(events, 'AttestationGenerated');
 
       expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(deployer.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(1);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
@@ -274,7 +274,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -288,7 +288,7 @@ describe('Test Identity Merkle attester contract', () => {
       const args = getEventArgs(events, 'AttestationGenerated');
 
       expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(deployer.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(1);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
@@ -313,7 +313,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group2.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree2.getHexProof(
@@ -338,7 +338,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -360,7 +360,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -386,7 +386,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -412,7 +412,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -465,37 +465,28 @@ describe('Test Identity Merkle attester contract', () => {
   describe('Delete attestation', () => {
     it('Should revert delete attestation', async () => {
       await expect(
-        identityMerkleAttester.deleteAttestations(
-          [collectionIdFirst.add(0), collectionIdFirst.add(1)],
-          destination1.address,
-          '0x'
-        )
+        identityMerkleAttester
+          .connect(randomSigner)
+          .deleteAttestations(
+            [collectionIdFirst.add(0), collectionIdFirst.add(1)],
+            deployer.address,
+            '0x'
+          )
       )
         .to.be.revertedWithCustomError(identityMerkleAttester, 'NotAttestationOwner')
-        .withArgs(collectionIdFirst.add(0), deployer.address);
+        .withArgs(collectionIdFirst.add(0), randomSigner.address);
     });
     it('Should delete attestation', async () => {
       const tx = await identityMerkleAttester
-        .connect(await ethers.getSigner(destination1.address))
-        .deleteAttestations(
-          [collectionIdFirst.add(0), collectionIdFirst.add(1)],
-          destination1.address,
-          '0x'
-        );
+        // .connect(await ethers.getSigner(deployer.address))
+        .deleteAttestations([collectionIdFirst.add(0)], deployer.address, '0x');
       const { events } = await tx.wait();
-      const args = getEventArgs(events, 'AttestationDeleted', 6);
-      const args2 = getEventArgs(events, 'AttestationDeleted', 7);
+      const args = getEventArgs(events, 'AttestationDeleted');
 
       expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(deployer.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(1);
-
-      // Empty burn, no attestation was present to begin with
-      expect(args2.attestation.issuer).to.equal(ethers.constants.AddressZero);
-      expect(args2.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
-      expect(args2.attestation.collectionId).to.equal(collectionIdFirst.add(1));
-      expect(args2.attestation.value).to.equal(0);
     });
   });
 });
