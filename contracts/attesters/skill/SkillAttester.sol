@@ -62,7 +62,8 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     override
   {
     Claim memory claim = request.claims[0];
-    uint256 tokenBalance = SKILL_BADGE.balanceOf(msg.sender, claim.groupId);
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + claim.groupId;
+    uint256 tokenBalance = SKILL_BADGE.balanceOf(msg.sender, attestationCollectionId);
 
     if (tokenBalance < claim.claimedValue)
       revert ClaimValueInvalid(tokenBalance, claim.claimedValue);
