@@ -12,7 +12,7 @@ import {EIP712Signature} from './libs/SignatureAttesterLib.sol';
 
 /**
  * @title  Signature Attester
- * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @author Kleoverse
  * @notice This attester is based on ECDSA signature verfication method.
  * Signature attester enables users to generate attestations based on signature signed using ECDSA scheme off-chain by a centralised verifier.
  **/

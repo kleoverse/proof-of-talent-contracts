@@ -4,7 +4,7 @@ pragma solidity ^0.8.14;
 
 /**
  * @title IAvailableRootsRegistry
- * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice Interface for (Merkle) Roots Registry
  */
 interface IAvailableRootsRegistry {

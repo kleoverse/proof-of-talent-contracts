@@ -49,8 +49,7 @@ A complete overview of the protocol is available in Sismo's [documentation](http
 
 ## Deployed contracts
 
-Deployed contracts can be found [here](https://www.notion.so/kleoverse/Deployed-contracts-db7ff241ec6147e9a26db4c0f824ebaf)
-
+Deployed contracts can be found [here](https://proofoftalent.org/deployed-contracts)
 
 ## Usage
 ### Installation

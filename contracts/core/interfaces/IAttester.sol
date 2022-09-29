@@ -6,7 +6,7 @@ import {IAttestationsRegistry} from '../interfaces/IAttestationsRegistry.sol';
 
 /**
  * @title IAttester
- * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice This is the interface for the attesters in Proof of Talent Protocol
  */
 interface IAttester {

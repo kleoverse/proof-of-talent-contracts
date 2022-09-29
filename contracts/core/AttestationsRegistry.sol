@@ -10,7 +10,7 @@ import {IBadges} from './interfaces/IBadges.sol';
 
 /**
  * @title Attestations Registry
- * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice Main contract of Proof of Talent Protocol, stores all recorded attestations in attestations collections
  * Only authorized attestations issuers can record attestation in the registry
  * Attesters that expect to record in the Attestations Registry must be authorized issuers

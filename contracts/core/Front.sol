@@ -8,7 +8,7 @@ import {Request, Attestation} from './libs/Structs.sol';
 
 /**
  * @title Front
- * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice This is the Front contract of the Proof of Talent protocol
  * Behind a proxy, it routes attestations request to the targeted attester and can perform some actions
  */

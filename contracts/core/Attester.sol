@@ -6,7 +6,7 @@ import {Request, Attestation, AttestationData} from './libs/Structs.sol';
 
 /**
  * @title Attester Abstract Contract
- * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice Contract to be inherited by Attesters
  * All attesters that expect to be authorized in Proof of Talent Protocol (i.e write access on the registry)
  * are recommended to implemented this abstract contract

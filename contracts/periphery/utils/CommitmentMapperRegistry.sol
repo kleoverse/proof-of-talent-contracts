@@ -7,7 +7,7 @@ import {ICommitmentMapperRegistry} from './interfaces/ICommitmentMapperRegistry.
 
 /**
  * @title Commitment Mapper Registry Contract
- * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice This contract stores information about the commitment mapper.
  * Its ethereum address and its EdDSA public key
  * For more information: https://commitment-mapper.docs.sismo.io

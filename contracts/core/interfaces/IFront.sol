@@ -5,7 +5,7 @@ import {Request, Attestation} from '../libs/Structs.sol';
 
 /**
  * @title IFront
- * @author Sahil Vasava (https://github.com/sahilvasava) - Forked from Sismo Protocol
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice This is the interface of the Front Contract
  */
 interface IFront {

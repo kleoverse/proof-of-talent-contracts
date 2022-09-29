@@ -11,7 +11,7 @@ import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.
 
 /**
  * @title  Skill Attester
- * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @author Kleoverse
  * @notice This attester uses ERC721/ERC1155 balance to generate attestations.
  * Skill attester enables users to generate attestations based on amount of tokens based on weights given to those tokens stored in Skill badge contract.
  * The basic idea to map different ERC721/ERC1155 (including cred badges in attestation registry) to skills with specific weights attached.

@@ -13,7 +13,7 @@ import {IAvailableRootsRegistry} from '../../periphery/utils/AvailableRootsRegis
 
 /**
  * @title  Identity Merkle Attester
- * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @author Kleoverse
  * @notice This attester is for merkle based data.
  * Identity Merkle attester enables users to generate attestations based on data collected from off-chain data source having identity authentication.
  * It uses Identity Badge generated using Signature Attester or similar attester to authenticate the user for data in merkle tree.
