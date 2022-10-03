@@ -10,7 +10,7 @@ import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 
 /**
  * @title Skill Badge ERC1155 contract
- * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @author Kleoverse
  * @notice This is basic read-only-balances ERC1155 NFT contract modified to store weigths for skill vs other erc721/erc1155 tokens.
  * Balance in this context is the Skill points calculated based on cred badges and weights allocated to them.
  **/

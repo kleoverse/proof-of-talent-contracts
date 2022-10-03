@@ -64,14 +64,6 @@ async function deploymentAction(
     options,
   } as DeployFrontArgs)) as DeployedFront;
 
-  await hre.run('attestations-registry-authorize-range', {
-    attestationsRegistryAddress: attestationsRegistry.address,
-    attesterAddress: front.address,
-    collectionIdFirst: frontFirstCollectionId,
-    collectionIdLast: frontLastCollectionId,
-    options,
-  } as AuthorizeRangeArgs);
-
   await hre.run('access-control-grant-role', {
     contractAddress: badges.address,
     role: await badges.EVENT_TRIGGERER_ROLE(),
@@ -81,7 +73,7 @@ async function deploymentAction(
 
   if (options?.log) {
     console.log(`
-      Deployed core contracts of the sismo protocol: 
+      Deployed core contracts of the proof of talent protocol: 
       attestationsRegistry: ${attestationsRegistry.address} 
       badges: ${badges.address} 
       front: ${front.address}

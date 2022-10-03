@@ -4,7 +4,7 @@ pragma solidity ^0.8.14;
 struct SignatureGroupProperties {
   uint128 groupIndex;
   uint32 generationTimestamp;
-  string badgeType; // identity, credential
+  string badgeType; // identity, credential, skill
   string source; // github, discord...
   bytes badgeData;
 }

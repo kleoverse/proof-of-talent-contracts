@@ -23,10 +23,10 @@ const ALPHA_RINKEBY_ROOTS_OWNER_RELAYER = '0x1Fe64E7E5ce645a751c239f9F656b136F41
 const ALPHA_RINKEBY_PROXY_ADMIN = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
 const ALPHA_RINKEBY_VERIFIER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
 // Polygon
-const ALPHA_POLYGON_OWNER = '0xaee4acd5c4Bf516330ca8fe11B07206fC6709294';
-const ALPHA_POLYGON_ROOTS_OWNER_RELAYER = '0xf0a0b692e1c764281c211948d03edeef5fb57111';
-const ALPHA_POLYGON_PROXY_ADMIN = '0x2110475dfbB8d331b300178A867372991ff35fA3';
-const ALPHA_POLYGON_VERIFIER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
+const ALPHA_POLYGON_OWNER = '0xe5c7bd50c532C518Fc2613C2934Bd2003940298C';
+const ALPHA_POLYGON_ROOTS_OWNER_RELAYER = '0xe5c7bd50c532C518Fc2613C2934Bd2003940298C';
+const ALPHA_POLYGON_PROXY_ADMIN = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
+const ALPHA_POLYGON_VERIFIER = '0xe5c7bd50c532C518Fc2613C2934Bd2003940298C';
 
 export const deploymentsConfig: DeploymentsConfigTypes = {
   polygon: {
@@ -39,38 +39,38 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
     badges: {
       owner: ALPHA_POLYGON_OWNER,
       // Badges Metadata URI for the Badges contract
-      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/polygon/metadata/{id}.json',
     },
-    front: {
+    signatureAttester: {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
+      verifierAddress: ALPHA_POLYGON_VERIFIER,
     },
-    hydraS1SimpleAttester: {
+    skillAttester: {
       collectionIdFirst: '10000001',
       collectionIdLast: '20000000',
+    },
+    identityMerkleAttester: {
+      collectionIdFirst: '20000001',
+      collectionIdLast: '30000000',
+    },
+    hydraS1SimpleAttester: {
+      collectionIdFirst: '30000001',
+      collectionIdLast: '40000000',
       initialRoot: '0x163c3224fa82070fbee7692146f505144b0307d668d8e8f803171b6ee7a4cd00',
     },
     hydraS1SoulboundAttester: {
-      collectionIdFirst: '20000001',
-      collectionIdLast: '30000000',
+      collectionIdFirst: '40000001',
+      collectionIdLast: '50000000',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
-    signatureAttester: {
-      collectionIdFirst: '300001',
-      collectionIdLast: '400000',
-      verifierAddress: ALPHA_POLYGON_VERIFIER,
-    },
-    identityMerkleAttester: {
-      collectionIdFirst: '500001',
-      collectionIdLast: '600000',
-    },
-    skillAttester: {
-      collectionIdFirst: '600001',
-      collectionIdLast: '700000',
+    front: {
+      collectionIdFirst: '50000001',
+      collectionIdLast: '60000000',
     },
     skillBadge: {
-      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/polygon/metadata/{id}.json',
     },
     attestationsRegistry: {
       owner: ALPHA_POLYGON_OWNER,
@@ -96,38 +96,38 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
     badges: {
       owner: ALPHA_RINKEBY_OWNER,
       // Badges Metadata URI for the Badges contract
-      uri: 'https://xdnaanuupvzzrktjiamg.supabase.co/storage/v1/object/public/badges/metadata/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/rinkeby/metadata/{id}.json',
     },
-    front: {
+    signatureAttester: {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
+      verifierAddress: ALPHA_RINKEBY_VERIFIER,
     },
-    hydraS1SimpleAttester: {
+    skillAttester: {
       collectionIdFirst: '10000001',
       collectionIdLast: '20000000',
+    },
+    identityMerkleAttester: {
+      collectionIdFirst: '20000001',
+      collectionIdLast: '30000000',
+    },
+    hydraS1SimpleAttester: {
+      collectionIdFirst: '30000001',
+      collectionIdLast: '40000000',
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
     },
     hydraS1SoulboundAttester: {
-      collectionIdFirst: '20000001',
-      collectionIdLast: '30000000',
+      collectionIdFirst: '40000001',
+      collectionIdLast: '50000000',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
-    signatureAttester: {
-      collectionIdFirst: '300001',
-      collectionIdLast: '400000',
-      verifierAddress: ALPHA_RINKEBY_VERIFIER,
-    },
-    identityMerkleAttester: {
-      collectionIdFirst: '500001',
-      collectionIdLast: '600000',
-    },
-    skillAttester: {
-      collectionIdFirst: '600001',
-      collectionIdLast: '700000',
+    front: {
+      collectionIdFirst: '50000001',
+      collectionIdLast: '60000000',
     },
     skillBadge: {
-      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/rinkeby/metadata/{id}.json',
     },
     attestationsRegistry: {
       owner: ALPHA_RINKEBY_OWNER,
@@ -151,38 +151,38 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
     badges: {
       owner: ALPHA_RINKEBY_OWNER,
       // Badges Metadata URI for the Badges contract
-      uri: 'https://xdnaanuupvzzrktjiamg.supabase.co/storage/v1/object/public/badges/metadata/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/goerli/metadata/{id}.json',
     },
-    front: {
+    signatureAttester: {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
+      verifierAddress: ALPHA_RINKEBY_VERIFIER,
     },
-    hydraS1SimpleAttester: {
+    skillAttester: {
       collectionIdFirst: '10000001',
       collectionIdLast: '20000000',
+    },
+    identityMerkleAttester: {
+      collectionIdFirst: '20000001',
+      collectionIdLast: '30000000',
+    },
+    hydraS1SimpleAttester: {
+      collectionIdFirst: '30000001',
+      collectionIdLast: '40000000',
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
     },
     hydraS1SoulboundAttester: {
-      collectionIdFirst: '20000001',
-      collectionIdLast: '30000000',
+      collectionIdFirst: '40000001',
+      collectionIdLast: '50000000',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
       initialRoot: '0',
     },
-    signatureAttester: {
-      collectionIdFirst: '300001',
-      collectionIdLast: '400000',
-      verifierAddress: ALPHA_RINKEBY_VERIFIER,
-    },
-    identityMerkleAttester: {
-      collectionIdFirst: '500001',
-      collectionIdLast: '600000',
-    },
-    skillAttester: {
-      collectionIdFirst: '600001',
-      collectionIdLast: '700000',
+    front: {
+      collectionIdFirst: '50000001',
+      collectionIdLast: '60000000',
     },
     skillBadge: {
-      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/goerli/metadata/{id}.json',
     },
     attestationsRegistry: {
       owner: ALPHA_RINKEBY_OWNER,
@@ -207,38 +207,38 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
     badges: {
       // account 0 of shared mneomonic
       owner: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
-      uri: 'https://metadata-dev.badges.zikies.io/default-badges/local/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/local/metadata/{id}.json',
     },
-    front: {
+    signatureAttester: {
       collectionIdFirst: '0',
-      collectionIdLast: '100000',
+      collectionIdLast: '10000000',
+      verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
+    },
+    skillAttester: {
+      collectionIdFirst: '10000001',
+      collectionIdLast: '20000000',
+    },
+    identityMerkleAttester: {
+      collectionIdFirst: '20000001',
+      collectionIdLast: '30000000',
     },
     hydraS1SimpleAttester: {
-      collectionIdFirst: '100001',
-      collectionIdLast: '200000',
+      collectionIdFirst: '30000001',
+      collectionIdLast: '40000000',
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
     },
     hydraS1SoulboundAttester: {
-      collectionIdFirst: '200001',
-      collectionIdLast: '300000',
+      collectionIdFirst: '40000001',
+      collectionIdLast: '50000000',
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
     },
-    signatureAttester: {
-      collectionIdFirst: '300001',
-      collectionIdLast: '400000',
-      verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
-    },
-    identityMerkleAttester: {
-      collectionIdFirst: '500001',
-      collectionIdLast: '600000',
-    },
-    skillAttester: {
-      collectionIdFirst: '600001',
-      collectionIdLast: '700000',
+    front: {
+      collectionIdFirst: '50000001',
+      collectionIdLast: '60000000',
     },
     skillBadge: {
-      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/local/metadata/{id}.json',
     },
     attestationsRegistry: {
       owner: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
@@ -263,38 +263,38 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
     badges: {
       // account 0 of shared mneomonic
       owner: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
-      uri: 'https://metadata-dev.badges.zikies.io/default-badges/local/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/local/metadata/{id}.json',
     },
-    front: {
+    signatureAttester: {
       collectionIdFirst: '0',
-      collectionIdLast: '100000',
+      collectionIdLast: '10000000',
+      verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
+    },
+    skillAttester: {
+      collectionIdFirst: '10000001',
+      collectionIdLast: '20000000',
+    },
+    identityMerkleAttester: {
+      collectionIdFirst: '20000001',
+      collectionIdLast: '30000000',
     },
     hydraS1SimpleAttester: {
-      collectionIdFirst: '100001',
-      collectionIdLast: '200000',
+      collectionIdFirst: '30000001',
+      collectionIdLast: '40000000',
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
     },
     hydraS1SoulboundAttester: {
-      collectionIdFirst: '200001',
-      collectionIdLast: '300000',
+      collectionIdFirst: '40000001',
+      collectionIdLast: '50000000',
       initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
       soulboundCooldownDuration: THREE_DAYS, // 3 days
     },
-    signatureAttester: {
-      collectionIdFirst: '300001',
-      collectionIdLast: '400000',
-      verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
-    },
-    identityMerkleAttester: {
-      collectionIdFirst: '500001',
-      collectionIdLast: '600000',
-    },
-    skillAttester: {
-      collectionIdFirst: '600001',
-      collectionIdLast: '700000',
+    front: {
+      collectionIdFirst: '50000001',
+      collectionIdLast: '60000000',
     },
     skillBadge: {
-      uri: 'https://metadata.badges.sismo.io/badges/polygon/{id}.json',
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/local/metadata/{id}.json',
     },
     attestationsRegistry: {
       owner: '0xb01ee322c4f028b8a6bfcd2a5d48107dc5bc99ec',

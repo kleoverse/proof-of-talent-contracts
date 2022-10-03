@@ -6,6 +6,8 @@ interface ISkillAttester {
   error ClaimValueInvalid(uint256 actualValue, uint256 claimValue);
   error SourceAlreadyUsed(address source);
   error CollectionIdOutOfBound(uint256 collectionId);
+  error NotAttestationOwner(uint256 collectionId, address sender);
+  error SourceDestinationNotSame(address source, address destination);
 
   event SourceToDestinationUpdated(uint256 attestationId, address source, address destination);
 

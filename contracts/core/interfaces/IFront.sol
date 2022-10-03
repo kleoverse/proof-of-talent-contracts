@@ -5,12 +5,11 @@ import {Request, Attestation} from '../libs/Structs.sol';
 
 /**
  * @title IFront
- * @author Sismo
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice This is the interface of the Front Contract
  */
 interface IFront {
   error DifferentRequestsDestinations();
-  event EarlyUserAttestationGenerated(address destination);
 
   /**
    * @dev Forward a request to an attester and generates an early user attestation

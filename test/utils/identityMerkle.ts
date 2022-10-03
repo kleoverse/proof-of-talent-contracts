@@ -39,7 +39,7 @@ export const generateIdentityMerkleLists = (Accounts: IdentityMerkleData[]): Lis
   const List1 = {};
   const List2 = {};
   Accounts.forEach((account, index) => {
-    Object.assign(List1, { [account.identifier]: index });
+    Object.assign(List1, { [account.identifier]: index + 1 });
     Object.assign(List2, { [account.identifier]: index + 1000 });
   });
   return [List1, List2];

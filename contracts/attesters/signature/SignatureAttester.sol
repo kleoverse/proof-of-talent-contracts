@@ -8,11 +8,11 @@ import '@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol';
 import {ISignatureAttester} from './interfaces/ISignatureAttester.sol';
 import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.sol';
-import {SignatureGroupProperties, EIP712Signature} from './libs/SignatureAttesterLib.sol';
+import {EIP712Signature} from './libs/SignatureAttesterLib.sol';
 
 /**
  * @title  Signature Attester
- * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @author Kleoverse
  * @notice This attester is based on ECDSA signature verfication method.
  * Signature attester enables users to generate attestations based on signature signed using ECDSA scheme off-chain by a centralised verifier.
  **/
@@ -26,7 +26,7 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
-  address internal _verifierAddress;
+  address public immutable VERIFIER;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
   /*******************************************************
@@ -47,7 +47,7 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
   ) Attester(attestationsRegistryAddress) EIP712('SignatureAttester', '1') {
     AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
     AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
-    _verifierAddress = verifierAddress;
+    VERIFIER = verifierAddress;
   }
 
   /*******************************************************
@@ -82,8 +82,25 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
     bytes32 hash = _hashTypedDataV4(structHash);
 
     address signer = ECDSA.recover(hash, sig.v, sig.r, sig.s);
-    if (signer != _verifierAddress) {
-      revert SignatureInvalid(_verifierAddress, signer);
+    if (signer != VERIFIER) {
+      revert SignatureInvalid(VERIFIER, signer);
+    }
+  }
+
+  /**
+   * @dev Throws if user attestations deletion request is not made by its owner
+   * @param attestations attestations to delete
+   */
+  function _verifyAttestationsDeletionRequest(Attestation[] memory attestations, bytes calldata)
+    internal
+    view
+    override
+  {
+    for (uint256 i = 0; i < attestations.length; i++) {
+      if (attestations[i].owner != msg.sender)
+        revert NotAttestationOwner(attestations[i].collectionId, msg.sender);
+      address destination = _getDestinationOfSource(attestations[i].collectionId, msg.sender);
+      if (destination != msg.sender) revert SourceDestinationNotSame(msg.sender, destination);
     }
   }
 
@@ -143,6 +160,21 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
     }
 
     _setDestinationForSource(attestationCollectionId, msg.sender, request.destination);
+  }
+
+  /**
+   * @dev Hook run before deleting the attestations.
+   * Unsets destination for the source and collectionId
+   * @param attestations Attestations that will be deleted
+   * @param proofData Data sent along the request to prove its validity
+   */
+  function _beforeDeleteAttestations(Attestation[] memory attestations, bytes calldata proofData)
+    internal
+    override
+  {
+    for (uint256 i = 0; i < attestations.length; i++) {
+      _setDestinationForSource(attestations[i].collectionId, msg.sender, address(0));
+    }
   }
 
   /*******************************************************

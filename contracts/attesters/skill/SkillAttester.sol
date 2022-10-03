@@ -8,11 +8,10 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import {ISkillAttester} from './interfaces/ISkillAttester.sol';
 import {Request, Attestation, Claim} from './../../core/libs/Structs.sol';
 import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.sol';
-import {SkillGroupProperties} from './libs/SkillAttesterLib.sol';
 
 /**
  * @title  Skill Attester
- * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @author Kleoverse
  * @notice This attester uses ERC721/ERC1155 balance to generate attestations.
  * Skill attester enables users to generate attestations based on amount of tokens based on weights given to those tokens stored in Skill badge contract.
  * The basic idea to map different ERC721/ERC1155 (including cred badges in attestation registry) to skills with specific weights attached.
@@ -24,7 +23,7 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
   // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
   uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
   uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
-  IERC1155 public SKILL_BADGE;
+  IERC1155 public immutable SKILL_BADGE;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
   /*******************************************************
@@ -63,10 +62,28 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     override
   {
     Claim memory claim = request.claims[0];
-    uint256 tokenBalance = SKILL_BADGE.balanceOf(msg.sender, claim.groupId);
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + claim.groupId;
+    uint256 tokenBalance = SKILL_BADGE.balanceOf(msg.sender, attestationCollectionId);
 
     if (tokenBalance < claim.claimedValue)
       revert ClaimValueInvalid(tokenBalance, claim.claimedValue);
+  }
+
+  /**
+   * @dev Throws if user attestations deletion request is not made by its owner
+   * @param attestations attestations to delete
+   */
+  function _verifyAttestationsDeletionRequest(Attestation[] memory attestations, bytes calldata)
+    internal
+    view
+    override
+  {
+    for (uint256 i = 0; i < attestations.length; i++) {
+      if (attestations[i].owner != msg.sender)
+        revert NotAttestationOwner(attestations[i].collectionId, msg.sender);
+      address destination = _getDestinationOfSource(attestations[i].collectionId, msg.sender);
+      if (destination != msg.sender) revert SourceDestinationNotSame(msg.sender, destination);
+    }
   }
 
   /**
@@ -81,10 +98,6 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     returns (Attestation[] memory)
   {
     Claim memory claim = request.claims[0];
-    SkillGroupProperties memory groupProperties = abi.decode(
-      claim.extraData,
-      (SkillGroupProperties)
-    );
 
     Attestation[] memory attestations = new Attestation[](1);
 
@@ -100,7 +113,7 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
       request.destination,
       issuer,
       claim.claimedValue,
-      groupProperties.generationTimestamp,
+      uint32(block.timestamp),
       claim.extraData
     );
     return (attestations);
@@ -129,6 +142,21 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     }
 
     _setDestinationForSource(attestationCollectionId, msg.sender, request.destination);
+  }
+
+  /**
+   * @dev Hook run before deleting the attestations.
+   * Unsets destination for the source and collectionId
+   * @param attestations Attestations that will be deleted
+   * @param proofData Data sent along the request to prove its validity
+   */
+  function _beforeDeleteAttestations(Attestation[] memory attestations, bytes calldata proofData)
+    internal
+    override
+  {
+    for (uint256 i = 0; i < attestations.length; i++) {
+      _setDestinationForSource(attestations[i].collectionId, msg.sender, address(0));
+    }
   }
 
   /*******************************************************
@@ -175,13 +203,5 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     returns (address)
   {
     return _sourcesToDestinations[attestationId][source];
-  }
-
-  /**
-   * @dev Sets the SKILL_BADGE address
-   * @param skillBadgeAddress Skill Badge contract where the cred to skill weights are stored
-   **/
-  function setSkillBadge(address skillBadgeAddress) public onlyOwner {
-    SKILL_BADGE = IERC1155(skillBadgeAddress);
   }
 }

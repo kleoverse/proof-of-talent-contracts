@@ -31,9 +31,9 @@ const HARDFORK = 'london';
 
 const MNEMONIC_PATH = "m/44'/60'/0'/0";
 
-const SISMO_SHARED_MNEMONIC =
+const POT_SHARED_MNEMONIC =
   'analyst decade album recall stem run cage ozone human pepper once insect';
-const MNEMONIC = process.env.MNEMONIC || SISMO_SHARED_MNEMONIC;
+const MNEMONIC = process.env.MNEMONIC || POT_SHARED_MNEMONIC;
 
 const INFURA_KEY = process.env.INFURA_KEY || '';
 const ALCHEMY_KEY = process.env.ALCHEMY_KEY || '';
@@ -55,7 +55,7 @@ const getCommonNetworkConfig = (networkName: string, networkId: number) => ({
   url: NETWORKS_RPC_URL[networkName] ?? '',
   // hardfork: HARDFORK,
   chainId: networkId,
-  accounts: [process.env.RINKEBY_PRIVATE_KEY || Wallet.createRandom().privateKey]
+  accounts: [ process.env.POLYGON_PRIVATE_KEY_MAIN || process.env.RINKEBY_PRIVATE_KEY || Wallet.createRandom().privateKey, Wallet.fromMnemonic(MNEMONIC).privateKey]
   // accounts: {
   //   mnemonic: MNEMONIC,
   //   path: MNEMONIC_PATH,
@@ -65,7 +65,7 @@ const getCommonNetworkConfig = (networkName: string, networkId: number) => ({
 });
 
 const accounts = Array.from(Array(20), (_, index) => {
-  const wallet = Wallet.fromMnemonic(SISMO_SHARED_MNEMONIC, `m/44'/60'/0'/0/${index}`);
+  const wallet = Wallet.fromMnemonic(POT_SHARED_MNEMONIC, `m/44'/60'/0'/0/${index}`);
   return {
     privateKey: wallet.privateKey,
     balance: '1000000000000000000000000',

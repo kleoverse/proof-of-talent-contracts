@@ -7,7 +7,7 @@ import {Initializable} from '@openzeppelin/contracts/proxy/utils/Initializable.s
 
 /**
  * @title Attesters Groups Registry
- * @author Sismo
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice This contract stores that data required by attesters to be available so they can verify user claims
  * This contract is deployed behind a proxy and this implementation is focused on storing merkle roots
  * For more information: https://available-roots-registry.docs.sismo.io

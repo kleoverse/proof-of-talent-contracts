@@ -3,7 +3,7 @@ pragma solidity ^0.8.14;
 
 /**
  * @title Interface for Badges contract
- * @author Sismo
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice Stateless ERC1155 contract. Reads balance from the values of attestations
  * The associated attestations registry triggers TransferSingle events from this contract
  * It allows badge "shadow mints and burns" to be caught by off-chain platforms

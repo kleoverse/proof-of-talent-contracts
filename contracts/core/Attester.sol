@@ -6,9 +6,9 @@ import {Request, Attestation, AttestationData} from './libs/Structs.sol';
 
 /**
  * @title Attester Abstract Contract
- * @author Sismo
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice Contract to be inherited by Attesters
- * All attesters that expect to be authorized in Sismo Protocol (i.e write access on the registry)
+ * All attesters that expect to be authorized in Proof of Talent Protocol (i.e write access on the registry)
  * are recommended to implemented this abstract contract
 
  * Take a look at the HydraS1SimpleAttester.sol for example on how to implement this abstract contract
@@ -83,9 +83,9 @@ abstract contract Attester is IAttester {
     bytes calldata proofData
   ) external override returns (Attestation[] memory) {
     // fetch attestations from the registry
-    address[] memory attestationOwners;
-    uint256[] memory attestationCollectionIds;
-    Attestation[] memory attestationsToDelete;
+    address[] memory attestationOwners = new address[](collectionIds.length);
+    uint256[] memory attestationCollectionIds = new uint256[](collectionIds.length);
+    Attestation[] memory attestationsToDelete = new Attestation[](collectionIds.length);
     for (uint256 i = 0; i < collectionIds.length; i++) {
       (
         address issuer,

@@ -26,7 +26,7 @@ export interface DeployHydraS1SoulboundAttesterArgs {
   commitmentMapperRegistryAddress: string;
   // address of the attestations contract,
   // which is part of the SAS
-  // Sismo Attestation State
+  // Proof of Talent Attestation State
   attestationsRegistryAddress: string;
   collectionIdFirst: BigNumberish;
   collectionIdLast: BigNumberish;

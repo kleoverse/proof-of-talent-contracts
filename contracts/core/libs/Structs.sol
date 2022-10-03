@@ -3,7 +3,7 @@ pragma solidity ^0.8.14;
 
 /**
  * @title  Attestations Registry State
- * @author Sismo
+ * @author Kleoverse - Forked from Sismo Protocol
  * @notice This contract holds all of the storage variables and data
  *         structures used by the AttestationsRegistry and parent
  *         contracts.

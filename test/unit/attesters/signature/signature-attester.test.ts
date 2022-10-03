@@ -1,7 +1,12 @@
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
-import { AttestationsRegistry, Badges, SignatureAttester } from 'types';
+import {
+  AttestationsRegistry,
+  Badges,
+  SignatureAttester,
+  TransparentUpgradeableProxy__factory,
+} from '../../../../types';
 import { RequestStruct } from 'types/Attester';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -21,6 +26,7 @@ import {
 } from '../../../utils';
 import { getEventArgs } from '../../../utils/expectEvent';
 import { getAddress } from 'ethers/lib/utils';
+import { getImplementation } from '../../../../utils';
 
 const config = deploymentsConfig[hre.network.name];
 const collectionIdFirst = BigNumber.from(config.signatureAttester.collectionIdFirst);
@@ -103,7 +109,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group1.properties),
           },
         ],
-        destination: destination1.account,
+        destination: source1.account,
       };
 
       const signData = generateEIP712TypedSignData(
@@ -122,8 +128,11 @@ describe('Test Signature attester contract', () => {
       const { events } = await tx.wait();
       const args = getEventArgs(events, 'AttestationGenerated');
 
+      console.log(tx);
+      console.log('deployer: ', deployer.address);
+      console.log('dest: ', source1.account);
       expect(args.attestation.issuer).to.equal(signatureAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(source1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(1);
     });
@@ -140,7 +149,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group1.properties),
           },
         ],
-        destination: destination1.account,
+        destination: source1.account,
       };
       const signData = generateEIP712TypedSignData(
         request,
@@ -159,7 +168,7 @@ describe('Test Signature attester contract', () => {
       const args = getEventArgs(events, 'AttestationGenerated');
 
       expect(args.attestation.issuer).to.equal(signatureAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.account).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(source1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
       expect(args.attestation.value).to.equal(2);
     });
@@ -175,7 +184,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group2.properties),
           },
         ],
-        destination: destination2.account,
+        destination: source1.account,
       };
 
       const signData = generateEIP712TypedSignData(
@@ -195,7 +204,7 @@ describe('Test Signature attester contract', () => {
       const args = getEventArgs(events, 'AttestationGenerated');
 
       expect(args.attestation.issuer).to.equal(signatureAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination2.account).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(source1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(1));
       expect(args.attestation.value).to.equal(1);
     });
@@ -221,7 +230,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group1.properties),
           },
         ],
-        destination: destination1.account,
+        destination: source1.account,
       };
       const forgedRequest = {
         claims: [
@@ -231,7 +240,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group1.properties),
           },
         ],
-        destination: destination1.account,
+        destination: source1.account,
       };
 
       const signData = generateEIP712TypedSignData(
@@ -274,7 +283,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group1.properties),
           },
         ],
-        destination: destination1.account,
+        destination: source1.account,
       };
 
       const signData = generateEIP712TypedSignData(
@@ -312,7 +321,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group1.properties),
           },
         ],
-        destination: destination1.account,
+        destination: source1.account,
       };
       const signData = generateEIP712TypedSignData(
         request,
@@ -342,7 +351,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group1.properties),
           },
         ],
-        destination: destination1.account,
+        destination: source1.account,
       };
       const signData = generateEIP712TypedSignData(
         request,
@@ -385,7 +394,7 @@ describe('Test Signature attester contract', () => {
             extraData: encodeSignatureGroupProperties(group1.properties),
           },
         ],
-        destination: destination1.account,
+        destination: source1.account,
       };
 
       const signData = generateEIP712TypedSignData(
@@ -435,6 +444,78 @@ describe('Test Signature attester contract', () => {
       await expect(signatureAttester.generateAttestations(wrongRequest, data))
         .to.be.revertedWithCustomError(signatureAttester, `SourceAlreadyUsed`)
         .withArgs(deployer.address);
+    });
+  });
+
+  /*************************************************************************************/
+  /***************************** Delete ATTESTATION ****************************/
+  /*************************************************************************************/
+
+  describe('Delete attestation', () => {
+    it('Should revert delete attestation', async () => {
+      await expect(
+        signatureAttester
+          .connect(randomSigner)
+          .deleteAttestations(
+            [collectionIdFirst.add(0), collectionIdFirst.add(1)],
+            source1.account,
+            '0x'
+          )
+      )
+        .to.be.revertedWithCustomError(signatureAttester, 'NotAttestationOwner')
+        .withArgs(collectionIdFirst.add(0), randomSigner.address);
+    });
+    it('Should delete attestation', async () => {
+      const tx = await signatureAttester.deleteAttestations(
+        [collectionIdFirst.add(0), collectionIdFirst.add(1)],
+        source1.account,
+        '0x'
+      );
+      const { events } = await tx.wait();
+      const args = getEventArgs(events, 'AttestationDeleted', 6);
+      const args2 = getEventArgs(events, 'AttestationDeleted', 7);
+
+      expect(args.attestation.issuer).to.equal(signatureAttester.address);
+      expect(args.attestation.owner).to.equal(BigNumber.from(source1.account).toHexString());
+      expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
+      expect(args.attestation.value).to.equal(2);
+
+      expect(args2.attestation.issuer).to.equal(signatureAttester.address);
+      expect(args2.attestation.owner).to.equal(BigNumber.from(source1.account).toHexString());
+      expect(args2.attestation.collectionId).to.equal(collectionIdFirst.add(1));
+      expect(args2.attestation.value).to.equal(1);
+    });
+  });
+
+  /*************************************************************************************/
+  /******************************* UPDATE IMPLEMENTATION *******************************/
+  /*************************************************************************************/
+  describe('Update implementation', () => {
+    it('Should update the implementation', async () => {
+      const proxyAdminSigner = await ethers.getSigner(
+        deploymentsConfig[hre.network.name].deployOptions.proxyAdmin as string
+      );
+
+      const { signatureAttester: newSignatureAttester } = await hre.run(
+        'deploy-signature-attester',
+        {
+          collectionIdFirst: config.signatureAttester.collectionIdFirst,
+          collectionIdLast: config.signatureAttester.collectionIdLast,
+          attestationsRegistryAddress: attestationsRegistry.address,
+          verifierAddress: config.signatureAttester.verifierAddress,
+          options: { behindProxy: false },
+        }
+      );
+
+      const signatureAttesterProxy = TransparentUpgradeableProxy__factory.connect(
+        signatureAttester.address,
+        proxyAdminSigner
+      );
+
+      await (await signatureAttesterProxy.upgradeTo(newSignatureAttester.address)).wait();
+
+      const implementationAddress = await getImplementation(signatureAttesterProxy);
+      expect(implementationAddress).to.eql(newSignatureAttester.address);
     });
   });
 });

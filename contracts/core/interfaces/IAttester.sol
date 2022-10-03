@@ -6,8 +6,8 @@ import {IAttestationsRegistry} from '../interfaces/IAttestationsRegistry.sol';
 
 /**
  * @title IAttester
- * @author Sismo
- * @notice This is the interface for the attesters in Sismo Protocol
+ * @author Kleoverse - Forked from Sismo Protocol
+ * @notice This is the interface for the attesters in Proof of Talent Protocol
  */
 interface IAttester {
   event AttestationGenerated(Attestation attestation);

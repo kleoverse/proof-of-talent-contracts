@@ -13,7 +13,7 @@ import {IAvailableRootsRegistry} from '../../periphery/utils/AvailableRootsRegis
 
 /**
  * @title  Identity Merkle Attester
- * @author Sahil Vasava (https://github.com/sahilvasava)
+ * @author Kleoverse
  * @notice This attester is for merkle based data.
  * Identity Merkle attester enables users to generate attestations based on data collected from off-chain data source having identity authentication.
  * It uses Identity Badge generated using Signature Attester or similar attester to authenticate the user for data in merkle tree.
@@ -78,6 +78,23 @@ contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
   }
 
   /**
+   * @dev Throws if user attestations deletion request is not made by its owner
+   * @param attestations attestations to delete
+   */
+  function _verifyAttestationsDeletionRequest(Attestation[] memory attestations, bytes calldata)
+    internal
+    view
+    override
+  {
+    for (uint256 i = 0; i < attestations.length; i++) {
+      if (attestations[i].owner != msg.sender)
+        revert NotAttestationOwner(attestations[i].collectionId, msg.sender);
+      address destination = _getDestinationOfSource(attestations[i].collectionId, msg.sender);
+      if (destination != msg.sender) revert SourceDestinationNotSame(msg.sender, destination);
+    }
+  }
+
+  /**
    * @dev Returns attestations that will be recorded, constructed from the user request
    * @param request users request. Claim of having met the badge requirement
    */
@@ -129,7 +146,12 @@ contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
     virtual
     override
   {
-    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + request.claims[0].groupId;
+    Claim memory claim = request.claims[0];
+    IdentityMerkleGroupProperties memory groupProperties = abi.decode(
+      claim.extraData,
+      (IdentityMerkleGroupProperties)
+    );
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + groupProperties.groupIndex;
     address currentDestination = _getDestinationOfSource(attestationCollectionId, msg.sender);
 
     if (currentDestination != address(0) && currentDestination != request.destination) {
@@ -137,6 +159,21 @@ contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
     }
 
     _setDestinationForSource(attestationCollectionId, msg.sender, request.destination);
+  }
+
+  /**
+   * @dev Hook run before deleting the attestations.
+   * Unsets destination for the source and collectionId
+   * @param attestations Attestations that will be deleted
+   * @param proofData Data sent along the request to prove its validity
+   */
+  function _beforeDeleteAttestations(Attestation[] memory attestations, bytes calldata proofData)
+    internal
+    override
+  {
+    for (uint256 i = 0; i < attestations.length; i++) {
+      _setDestinationForSource(attestations[i].collectionId, msg.sender, address(0));
+    }
   }
 
   /*******************************************************

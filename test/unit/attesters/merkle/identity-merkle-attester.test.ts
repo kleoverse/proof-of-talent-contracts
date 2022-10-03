@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import hre from 'hardhat';
+import hre, { ethers } from 'hardhat';
 import {
   AttestationsRegistry,
   AvailableRootsRegistry,
@@ -10,7 +10,7 @@ import {
 import { RequestStruct } from 'types/Attester';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
-import { BigNumber, ethers, utils } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 import { Deployed0 } from 'tasks/deploy-tasks/full/0-deploy-core-and-hydra-s1-simple-and-soulbound.task';
 import { deploymentsConfig } from '../../../../tasks/deploy-tasks/deployments-config';
 import {
@@ -245,7 +245,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -259,9 +259,9 @@ describe('Test Identity Merkle attester contract', () => {
       const args = getEventArgs(events, 'AttestationGenerated');
 
       expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(deployer.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
-      expect(args.attestation.value).to.equal(0);
+      expect(args.attestation.value).to.equal(1);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
     });
 
@@ -274,7 +274,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -288,9 +288,9 @@ describe('Test Identity Merkle attester contract', () => {
       const args = getEventArgs(events, 'AttestationGenerated');
 
       expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
-      expect(args.attestation.owner).to.equal(BigNumber.from(destination1.address).toHexString());
+      expect(args.attestation.owner).to.equal(BigNumber.from(deployer.address).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
-      expect(args.attestation.value).to.equal(0);
+      expect(args.attestation.value).to.equal(1);
       expect(args.attestation.timestamp).to.equal(group1.properties.generationTimestamp);
     });
   });
@@ -313,7 +313,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group2.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree2.getHexProof(
@@ -338,7 +338,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -360,7 +360,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -386,7 +386,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -412,7 +412,7 @@ describe('Test Identity Merkle attester contract', () => {
             extraData: encodeIdentityMerkleGroupProperties(group1.properties, source1.identifier),
           },
         ],
-        destination: destination1.address,
+        destination: deployer.address,
       };
 
       const path = accountsTree1.getHexProof(
@@ -455,6 +455,38 @@ describe('Test Identity Merkle attester contract', () => {
       await expect(identityMerkleAttester.generateAttestations(request, data))
         .to.be.revertedWithCustomError(identityMerkleAttester, `SourceAlreadyUsed`)
         .withArgs(deployer.address);
+    });
+  });
+
+  /*************************************************************************************/
+  /***************************** Delete ATTESTATION ****************************/
+  /*************************************************************************************/
+
+  describe('Delete attestation', () => {
+    it('Should revert delete attestation', async () => {
+      await expect(
+        identityMerkleAttester
+          .connect(randomSigner)
+          .deleteAttestations(
+            [collectionIdFirst.add(0), collectionIdFirst.add(1)],
+            deployer.address,
+            '0x'
+          )
+      )
+        .to.be.revertedWithCustomError(identityMerkleAttester, 'NotAttestationOwner')
+        .withArgs(collectionIdFirst.add(0), randomSigner.address);
+    });
+    it('Should delete attestation', async () => {
+      const tx = await identityMerkleAttester
+        // .connect(await ethers.getSigner(deployer.address))
+        .deleteAttestations([collectionIdFirst.add(0)], deployer.address, '0x');
+      const { events } = await tx.wait();
+      const args = getEventArgs(events, 'AttestationDeleted');
+
+      expect(args.attestation.issuer).to.equal(identityMerkleAttester.address);
+      expect(args.attestation.owner).to.equal(BigNumber.from(deployer.address).toHexString());
+      expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(0));
+      expect(args.attestation.value).to.equal(1);
     });
   });
 });

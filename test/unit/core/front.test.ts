@@ -149,15 +149,6 @@ describe('Test Front contract', () => {
         },
       };
 
-      earlyUserGeneratedAttesation = {
-        collectionId: await front.EARLY_USER_COLLECTION(),
-        owner: userDestination.address,
-        issuer: front.address,
-        value: 1,
-        timestamp: 0,
-        extraData: ethers.utils.toUtf8Bytes('With strong love from Sismo'),
-      };
-
       attestationsArray = [
         [
           [
@@ -220,67 +211,6 @@ describe('Test Front contract', () => {
       ).to.be.true;
 
       await assertAttestationDataIsValid(attestationsRegistry, attestations.first, userDestination);
-    });
-    it('Should not generate early user attestation if the date is > to Sept 15 2022', async () => {
-      await increaseTime(hre, Date.parse('16 Sept 20222 00:00:00 GMT') - Date.now());
-
-      const generateAttestationsTransaction = await front.generateAttestations(
-        mockAttester.address,
-        requests.first,
-        '0x'
-      );
-
-      // 1 - Checks that the transaction didn't emitted the event
-      expect(generateAttestationsTransaction).to.not.emit(front, 'EarlyUserAttestationGenerated');
-
-      // 2 - Checks that early user attestation was not recorded on the user
-      expect(
-        await attestationsRegistry.hasAttestation(
-          await front.EARLY_USER_COLLECTION(),
-          userDestination.address
-        )
-      ).to.be.false;
-    });
-
-    it('Should generate early user attestation if the date is < to Sept 15 2022', async () => {
-      if (Date.now() > Date.parse('15 Sept 2022 00:00:00 GMT')) {
-        return;
-      }
-
-      const generateAttestationsTransaction = await front.generateAttestations(
-        mockAttester.address,
-        requests.first,
-        '0x'
-      );
-
-      earlyUserGeneratedAttesation.timestamp = await (
-        await ethers.provider.getBlock('latest')
-      ).timestamp;
-
-      // 1 - Checks that the transaction emitted the events
-      await assertAttestationRecordedEventEmitted(
-        generateAttestationsTransaction,
-        attestationsRegistry,
-        earlyUserGeneratedAttesation
-      );
-
-      await expect(generateAttestationsTransaction)
-        .to.emit(front, 'EarlyUserAttestationGenerated')
-        .withArgs(earlyUserGeneratedAttesation.owner);
-
-      // 2 - Checks that early user attestation was recorded on the user
-      expect(
-        await attestationsRegistry.hasAttestation(
-          await front.EARLY_USER_COLLECTION(),
-          userDestination.address
-        )
-      ).to.be.true;
-
-      await assertAttestationDataIsValid(
-        attestationsRegistry,
-        earlyUserGeneratedAttesation,
-        userDestination
-      );
     });
 
     it('Should return the builded attestations', async () => {
@@ -358,70 +288,6 @@ describe('Test Front contract', () => {
       await assertAttestationDataIsValid(
         attestationsRegistry,
         attestations.second,
-        userDestination
-      );
-    });
-
-    it('Should not generate early user attestation if the date is > to Sept 15 2022', async () => {
-      if (Date.now() < Date.parse('15 Sept 2022 00:00:00 GMT')) {
-        await increaseTime(hre, Date.parse('15 Sept 20222 00:00:00 GMT') - Date.now());
-      }
-
-      const generateAttestationsTransaction = await front.batchGenerateAttestations(
-        [mockAttester.address, mockAttester.address],
-        [requests.first, requests.second],
-        ['0x', '0x']
-      );
-
-      // 1 - Checks that the transaction didn't emitted the event
-      expect(generateAttestationsTransaction).to.not.emit(front, 'EarlyUserAttestationGenerated');
-
-      // 2 - Checks that early user attestation was not recorded on the user
-      expect(
-        await attestationsRegistry.hasAttestation(
-          await front.EARLY_USER_COLLECTION(),
-          userDestination.address
-        )
-      ).to.be.false;
-    });
-
-    it('Should generate early user attestation if the date is < to Sept 15 2022', async () => {
-      if (Date.now() > Date.parse('15 Sept 2022 00:00:00 GMT')) {
-        return;
-      }
-
-      const batchGenerateAttestationsTransaction = await front.batchGenerateAttestations(
-        [mockAttester.address, mockAttester.address],
-        [requests.first, requests.second],
-        ['0x', '0x']
-      );
-
-      earlyUserGeneratedAttesation.timestamp = await (
-        await ethers.provider.getBlock('latest')
-      ).timestamp;
-
-      // 1 - Checks that the transaction emitted the events
-      await assertAttestationRecordedEventEmitted(
-        batchGenerateAttestationsTransaction,
-        attestationsRegistry,
-        earlyUserGeneratedAttesation
-      );
-
-      await expect(batchGenerateAttestationsTransaction)
-        .to.emit(front, 'EarlyUserAttestationGenerated')
-        .withArgs(userDestination.address);
-
-      // 2 - Checks that early user attestation was recorded on the user
-      expect(
-        await attestationsRegistry.hasAttestation(
-          await front.EARLY_USER_COLLECTION(),
-          userDestination.address
-        )
-      ).to.be.true;
-
-      await assertAttestationDataIsValid(
-        attestationsRegistry,
-        earlyUserGeneratedAttesation,
         userDestination
       );
     });

@@ -8,17 +8,12 @@ import {Request, Attestation} from './libs/Structs.sol';
 
 /**
  * @title Front
- * @author Sismo
- * @notice This is the Front contract of the Sismo protocol
+ * @author Kleoverse - Forked from Sismo Protocol
+ * @notice This is the Front contract of the Proof of Talent protocol
  * Behind a proxy, it routes attestations request to the targeted attester and can perform some actions
- * This specific implementation rewards early users with a early user attestation if they used sismo before ethcc conference
-
- * For more information: https://front.docs.sismo.io
  */
 contract Front is IFront {
   IAttestationsRegistry public immutable ATTESTATIONS_REGISTRY;
-  uint256 public constant EARLY_USER_COLLECTION = 0;
-  uint32 public constant EARLY_USER_BADGE_END_DATE = 1663200000; // Sept 15
 
   /**
    * @dev Constructor
@@ -29,7 +24,7 @@ contract Front is IFront {
   }
 
   /**
-   * @dev Forward a request to an attester and generates an early user attestation
+   * @dev Forward a request to an attester
    * @param attester Attester targeted by the request
    * @param request Request sent to the attester
    * @param proofData Data provided to the attester to back the request
@@ -44,12 +39,11 @@ contract Front is IFront {
       request,
       proofData
     );
-    _generateEarlyUserAttestation(request.destination);
     return attestations;
   }
 
   /**
-   * @dev generate multiple attestations at once, to the same destination, generates an early user attestation
+   * @dev generate multiple attestations at once, to the same destination
    * @param attesters Attesters targeted by the attesters
    * @param requests Requests sent to attester
    * @param proofDataArray Data sent with each request
@@ -69,7 +63,6 @@ contract Front is IFront {
         proofDataArray[i]
       );
     }
-    _generateEarlyUserAttestation(destination);
     return attestations;
   }
 
@@ -124,29 +117,5 @@ contract Front is IFront {
     bytes calldata proofData
   ) internal returns (Attestation[] memory) {
     return IAttester(attester).generateAttestations(request, proofData);
-  }
-
-  function _generateEarlyUserAttestation(address destination) internal {
-    uint32 currentTimestamp = uint32(block.timestamp);
-    if (currentTimestamp < EARLY_USER_BADGE_END_DATE) {
-      bool alreadyHasAttestation = ATTESTATIONS_REGISTRY.hasAttestation(
-        EARLY_USER_COLLECTION,
-        destination
-      );
-
-      if (!alreadyHasAttestation) {
-        Attestation[] memory attestations = new Attestation[](1);
-        attestations[0] = Attestation(
-          EARLY_USER_COLLECTION,
-          destination,
-          address(this),
-          1,
-          currentTimestamp,
-          'With strong love from Sismo'
-        );
-        ATTESTATIONS_REGISTRY.recordAttestations(attestations);
-        emit EarlyUserAttestationGenerated(destination);
-      }
-    }
   }
 }

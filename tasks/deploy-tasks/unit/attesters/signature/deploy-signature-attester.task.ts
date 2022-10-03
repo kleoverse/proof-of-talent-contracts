@@ -16,7 +16,7 @@ import { BigNumber, BigNumberish } from 'ethers';
 export interface DeploySignatureAttesterArgs {
   // address of the attestations contract,
   // which is part of the SAS
-  // Sismo Attestation State
+  // Proof of Talent Attestation State
   attestationsRegistryAddress: string;
   collectionIdFirst: BigNumberish;
   collectionIdLast: BigNumberish;
@@ -54,7 +54,6 @@ async function deploymentAction(
 
   const initData = '0x';
 
-  if (options?.behindProxy) options.behindProxy = false;
   const deployed = await customDeployContract(
     hre,
     deployer,

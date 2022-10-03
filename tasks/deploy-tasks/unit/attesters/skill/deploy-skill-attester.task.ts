@@ -51,7 +51,6 @@ async function deploymentAction(
 
   const initData = '0x';
 
-  if (options?.behindProxy) options.behindProxy = false;
   const deployed = await customDeployContract(
     hre,
     deployer,
