@@ -3,8 +3,12 @@
   <img src="docs/kleoverse-logo.png" alt="Logo" width="100" height="100" style="borderRadius: 20px">
 
   <h3 align="center">
-    Proof of Talent Protocol - Kleoverse
+    Proof of Talent Protocol
   </h3>
+  
+  <p align="center">
+    Developed by <a href="https://www.kleoverse.com/" target="_blank">Kleoverse</a> crew
+  </p>
 
   <p align="center">
     Built on top of <a href="https://www.sismo.io/" target="_blank">Sismo Protocol</a>
@@ -24,6 +28,9 @@
 </div>
 <br/>
 This repository contains the smart contracts of the Proof Of Talent Protocol. The architecture is forked from Sismo Protocol. We have created new attesters and supporting skill badge contract.
+
+
+See the whole documentation at https://proofoftalent.org.
 
 There are three core contracts:
 
