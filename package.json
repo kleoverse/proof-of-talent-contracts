@@ -46,7 +46,7 @@
   "dependencies": {
     "@metamask/eth-sig-util": "^4.0.1",
     "@nomiclabs/hardhat-ethers": "^2.0.5",
-    "@openzeppelin/contracts": "^4.5.0",
+    "@openzeppelin/contracts": "^4.7.3",
     "@sismo-core/commitment-mapper-tester-js": "^1.0.11",
     "@sismo-core/hydra-s1": "^1.0.2",
     "@trufflesuite/eth-sig-util": "^1.4.2",
