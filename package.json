@@ -4,7 +4,6 @@
   "description": "Proof of Talent attestations repo - Kleoverse (Forked & built on top of Sismo Protocol)",
   "main": "index.js",
   "repository": "git@github.com:kleoverse/proof-of-talent-contracts.git",
-  "author": "leosayous21.sismo.eth <leosayous@gmail.com>",
   "contributors": [
     {
       "name": "Sahil Vasava",
