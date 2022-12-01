@@ -65,6 +65,7 @@ contract SkillBadge is Initializable, ERC1155, Ownable {
       uint256 credId = skills[id].credIds[i];
       address _address = skills[id].addresses[i];
       ContractType _cType = skills[id].contractTypes[i];
+      if (skills[id].contractsToCredsToWeights[_address][credId] == 0) continue;
       if (_cType == ContractType.ERC1155) {
         skillPoints +=
           IERC1155(_address).balanceOf(account, credId) *

@@ -55,7 +55,12 @@ const getCommonNetworkConfig = (networkName: string, networkId: number) => ({
   url: NETWORKS_RPC_URL[networkName] ?? '',
   // hardfork: HARDFORK,
   chainId: networkId,
-  accounts: [ process.env.POLYGON_PRIVATE_KEY_MAIN || process.env.RINKEBY_PRIVATE_KEY || Wallet.createRandom().privateKey, Wallet.fromMnemonic(MNEMONIC).privateKey]
+  accounts: [
+    process.env.POLYGON_PRIVATE_KEY_MAIN || Wallet.createRandom().privateKey,
+    Wallet.fromMnemonic(MNEMONIC).privateKey,
+    process.env.RINKEBY_PRIVATE_KEY || Wallet.createRandom().privateKey,
+    Wallet.fromMnemonic(MNEMONIC).privateKey,
+  ],
   // accounts: {
   //   mnemonic: MNEMONIC,
   //   path: MNEMONIC_PATH,
@@ -89,7 +94,7 @@ const config: HardhatUserConfig = {
     outDir: 'types',
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: process.env.POLYGONSCAN_API_KEY,
   },
   defaultNetwork: 'hardhat',
   networks: {
