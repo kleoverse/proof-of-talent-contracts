@@ -12,6 +12,7 @@ import {
 
 import { SkillBadge, SkillBadge__factory } from '../../../../../types';
 import { BigNumber, BigNumberish } from 'ethers';
+import { deploymentsConfig } from '../../../../../tasks/deploy-tasks/deployments-config';
 
 export interface DeploySkillBadgeArgs {
   uri: string;
@@ -32,6 +33,11 @@ async function deploymentAction(
   const deploymentName = buildDeploymentName(CONTRACT_NAME, options?.deploymentNamePrefix);
 
   const deploymentArgs = [uri];
+  const config = deploymentsConfig[hre.network.name];
+  options = { ...config.deployOptions, ...options };
+  if (options.manualConfirm || options.log) {
+    console.log('deploy-skill-badge: ', hre.network.name);
+  }
 
   await beforeDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, options);
 
