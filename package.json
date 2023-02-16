@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.2",
-    "@nomiclabs/hardhat-etherscan": "^3.0.1",
+    "@nomiclabs/hardhat-etherscan": "^3.1.6",
     "@typechain/hardhat": "^4.0.0",
     "@types/chai": "^4.3.0",
     "@types/jest": "^27.4.0",
@@ -57,7 +57,7 @@
     "eslint": "^8.14.0",
     "ethers": "^5.6.8",
     "fast-glob": "^3.2.11",
-    "hardhat": "^2.9.7",
+    "hardhat": "^2.12.7",
     "hardhat-storage-layout": "^0.1.6",
     "husky": "4.2.5",
     "js-sha3": "^0.8.0",
