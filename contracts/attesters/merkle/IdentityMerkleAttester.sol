@@ -19,10 +19,6 @@ import {IAvailableRootsRegistry} from '../../periphery/utils/AvailableRootsRegis
  * It uses Identity Badge generated using Signature Attester or similar attester to authenticate the user for data in merkle tree.
  **/
 contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
-  // The deployed contract will need to be authorized to write into the Attestation registry
-  // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
   IAvailableRootsRegistry immutable AVAILABLE_ROOTS_REGISTRY;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
@@ -41,9 +37,7 @@ contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
     address availableRootsRegistryAddress,
     uint256 collectionIdFirst,
     uint256 collectionIdLast
-  ) Attester(attestationsRegistryAddress) {
-    AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
-    AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
+  ) Attester(attestationsRegistryAddress, collectionIdFirst, collectionIdLast) {
     AVAILABLE_ROOTS_REGISTRY = IAvailableRootsRegistry(availableRootsRegistryAddress);
   }
 

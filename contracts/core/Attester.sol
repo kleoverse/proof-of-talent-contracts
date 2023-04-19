@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.14;
+import '@openzeppelin/contracts/access/Ownable.sol';
 import {IAttester} from './interfaces/IAttester.sol';
 import {IAttestationsRegistry} from './interfaces/IAttestationsRegistry.sol';
 import {Request, Attestation, AttestationData} from './libs/Structs.sol';
@@ -28,16 +29,27 @@ import {Request, Attestation, AttestationData} from './libs/Structs.sol';
 
  * For more information: https://attesters.docs.sismo.io
  **/
-abstract contract Attester is IAttester {
+abstract contract Attester is IAttester, Ownable {
   // Registry where all attestations are stored
   IAttestationsRegistry internal immutable ATTESTATIONS_REGISTRY;
+  // The deployed contract will need to be authorized to write into the Attestation registry
+  // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
+  uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
+  uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
+  mapping(uint256 => uint64) internal _badgeMintingPrice;
 
   /**
    * @dev Constructor
    * @param attestationsRegistryAddress The address of the AttestationsRegistry contract storing attestations
    */
-  constructor(address attestationsRegistryAddress) {
+  constructor(
+    address attestationsRegistryAddress,
+    uint256 collectionIdFirst,
+    uint256 collectionIdLast
+  ) Ownable() {
     ATTESTATIONS_REGISTRY = IAttestationsRegistry(attestationsRegistryAddress);
+    AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
+    AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
   }
 
   /**
@@ -48,11 +60,14 @@ abstract contract Attester is IAttester {
    */
   function generateAttestations(Request calldata request, bytes calldata proofData)
     external
+    payable
     override
     returns (Attestation[] memory)
   {
     // Verify if request is valid by verifying against proof
     _verifyRequest(request, proofData);
+    uint256 attestationCollectionId = AUTHORIZED_COLLECTION_ID_FIRST + request.claims[0].groupId;
+    _verifyBadgePayment(attestationCollectionId);
 
     // Generate the actual attestations from user request
     Attestation[] memory attestations = buildAttestations(request, proofData);
@@ -144,6 +159,27 @@ abstract contract Attester is IAttester {
     return ATTESTATIONS_REGISTRY;
   }
 
+  function setBadgeMintingPrice(uint256[] memory collectionIds, uint64[] memory priceList)
+    external
+    onlyOwner
+  {
+    if (collectionIds.length != priceList.length) {
+      revert LengthMismatch('colletionIds vs priceList');
+    }
+    for (uint256 i = 0; i < collectionIds.length; i++) {
+      _setBadgeMintingPrice(collectionIds[i], priceList[i]);
+    }
+  }
+
+  function _setBadgeMintingPrice(uint256 collectionId, uint64 price) internal {
+    if (
+      collectionId < AUTHORIZED_COLLECTION_ID_FIRST || collectionId > AUTHORIZED_COLLECTION_ID_LAST
+    ) {
+      revert CollectionIdOutOfBound(collectionId);
+    }
+    _badgeMintingPrice[collectionId] = price;
+  }
+
   /**
    * @dev MANDATORY: must be implemented in attesters
    * It should verify the user request is valid
@@ -205,4 +241,10 @@ abstract contract Attester is IAttester {
     internal
     virtual
   {}
+
+  function _verifyBadgePayment(uint256 collectionId) internal view {
+    if (_badgeMintingPrice[collectionId] > 0 && msg.value != _badgeMintingPrice[collectionId]) {
+      revert InsufficientMintingPrice(_badgeMintingPrice[collectionId], msg.value);
+    }
+  }
 }

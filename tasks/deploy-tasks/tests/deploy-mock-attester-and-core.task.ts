@@ -51,8 +51,8 @@ async function deploymentAction(
     .connect(deployer)
     .authorizeRange(
       deployedMockAttester.mockAttester.address,
-      await deployedMockAttester.mockAttester.ATTESTATION_ID_MIN(),
-      await deployedMockAttester.mockAttester.ATTESTATION_ID_MAX()
+      await deployedMockAttester.mockAttester.AUTHORIZED_COLLECTION_ID_FIRST(),
+      await deployedMockAttester.mockAttester.AUTHORIZED_COLLECTION_ID_LAST()
     );
 
   return { ...deployedCore, ...deployedMockAttester };

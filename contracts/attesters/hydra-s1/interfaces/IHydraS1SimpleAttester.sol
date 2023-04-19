@@ -13,7 +13,6 @@ import {IHydraS1Base} from './../base/IHydraS1Base.sol';
 // todo: explain well what is specific to this attester
 interface IHydraS1SimpleAttester is IHydraS1Base, IAttester {
   error TicketUsed(uint256 userTicket);
-  error CollectionIdOutOfBound(uint256 collectionId);
 
   event TicketDestinationUpdated(uint256 ticket, address newOwner);
 
@@ -23,15 +22,15 @@ interface IHydraS1SimpleAttester is IHydraS1Base, IAttester {
    **/
   function getDestinationOfTicket(uint256 userTicket) external view returns (address);
 
-  /**
-   * @dev Getter
-   * returns of the first collection in which the attester is supposed to record
-   **/
-  function AUTHORIZED_COLLECTION_ID_FIRST() external view returns (uint256);
+  // /**
+  //  * @dev Getter
+  //  * returns of the first collection in which the attester is supposed to record
+  //  **/
+  // function AUTHORIZED_COLLECTION_ID_FIRST() external view returns (uint256);
 
-  /**
-   * @dev Getter
-   * returns of the last collection in which the attester is supposed to record
-   **/
-  function AUTHORIZED_COLLECTION_ID_LAST() external view returns (uint256);
+  // /**
+  //  * @dev Getter
+  //  * returns of the last collection in which the attester is supposed to record
+  //  **/
+  // function AUTHORIZED_COLLECTION_ID_LAST() external view returns (uint256);
 }

@@ -103,7 +103,7 @@ describe('Test Skill attester contract', () => {
       } as DeployMockSkillBadgeArgs)) as DeployedMockSkillBadge);
 
       ({ attestationsRegistry } = (await hre.run(
-        '0-deploy-core-and-hydra-s1-simple-and-soulbound',
+        '0-deploy-core-and-signature-and-skill-and-identity-merkle',
         {
           options: { log: false },
         }

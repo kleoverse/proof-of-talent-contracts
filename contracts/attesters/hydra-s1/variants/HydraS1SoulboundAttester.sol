@@ -51,10 +51,6 @@ contract HydraS1SoulboundAttester is IHydraS1SoulboundAttester, HydraS1Base, Att
   using HydraS1Lib for bytes;
   using HydraS1Lib for Request;
 
-  // The deployed contract will need to be authorized to write into the Attestation registry
-  // It should get write access on collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
   uint256 public immutable SOULBOUND_COOLDOWN_DURATION;
 
   mapping(uint256 => TicketData) internal _userTicketsData;
@@ -80,11 +76,9 @@ contract HydraS1SoulboundAttester is IHydraS1SoulboundAttester, HydraS1Base, Att
     uint256 collectionIdLast,
     uint256 soulboundCooldownDuration
   )
-    Attester(attestationsRegistryAddress)
+    Attester(attestationsRegistryAddress, collectionIdFirst, collectionIdLast)
     HydraS1Base(hydraS1VerifierAddress, availableRootsRegistryAddress, commitmentMapperAddress)
   {
-    AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
-    AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
     SOULBOUND_COOLDOWN_DURATION = soulboundCooldownDuration;
   }
 

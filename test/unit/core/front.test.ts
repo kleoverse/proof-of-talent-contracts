@@ -205,7 +205,7 @@ describe('Test Front contract', () => {
       // 2 - Checks that forwarded attestations was recorded on the user
       expect(
         await attestationsRegistry.hasAttestation(
-          await mockAttester.ATTESTATION_ID_MIN(),
+          await mockAttester.AUTHORIZED_COLLECTION_ID_FIRST(),
           userDestination.address
         )
       ).to.be.true;
@@ -272,14 +272,14 @@ describe('Test Front contract', () => {
       // 2 - Checks that batch forwarded attestations was recorded on the user
       expect(
         await attestationsRegistry.hasAttestation(
-          await mockAttester.ATTESTATION_ID_MIN(),
+          await mockAttester.AUTHORIZED_COLLECTION_ID_FIRST(),
           userDestination.address
         )
       ).to.be.true;
 
       expect(
         await attestationsRegistry.hasAttestation(
-          await mockAttester.ATTESTATION_ID_MAX(),
+          await mockAttester.AUTHORIZED_COLLECTION_ID_LAST(),
           userDestination.address
         )
       ).to.be.true;

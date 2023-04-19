@@ -46,11 +46,6 @@ contract HydraS1SimpleAttester is IHydraS1SimpleAttester, HydraS1Base, Attester 
   using HydraS1Lib for bytes;
   using HydraS1Lib for Request;
 
-  // The deployed contract will need to be authorized to write into the Attestation registry
-  // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
-
   mapping(uint256 => address) internal _ticketsDestinations;
 
   /*******************************************************
@@ -73,12 +68,9 @@ contract HydraS1SimpleAttester is IHydraS1SimpleAttester, HydraS1Base, Attester 
     uint256 collectionIdFirst,
     uint256 collectionIdLast
   )
-    Attester(attestationsRegistryAddress)
+    Attester(attestationsRegistryAddress, collectionIdFirst, collectionIdLast)
     HydraS1Base(hydraS1VerifierAddress, availableRootsRegistryAddress, commitmentMapperAddress)
-  {
-    AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
-    AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
-  }
+  {}
 
   /*******************************************************
     MANDATORY FUNCTIONS TO OVERRIDE FROM ATTESTER.SOL

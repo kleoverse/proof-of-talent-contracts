@@ -255,7 +255,7 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
   hardhat: {
     deployOptions: {
       manualConfirm: false,
-      log: false,
+      log: true,
       behindProxy: true,
       // account 13 of shared mnemonic
       proxyAdmin: '0x569eaB3c91828B7d9f951d335bC12A6aABEc1458',

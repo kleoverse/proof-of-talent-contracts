@@ -15,6 +15,9 @@ interface IAttester {
   event AttestationDeleted(Attestation attestation);
 
   error AttestationDeletionNotImplemented();
+  error InsufficientMintingPrice(uint256 price, uint256 sent);
+  error LengthMismatch(string msg);
+  error CollectionIdOutOfBound(uint256 collectionId);
 
   /**
    * @dev Main external function. Allows to generate attestations by making a request and submitting proof
@@ -24,6 +27,7 @@ interface IAttester {
    */
   function generateAttestations(Request calldata request, bytes calldata proofData)
     external
+    payable
     returns (Attestation[] memory);
 
   /**

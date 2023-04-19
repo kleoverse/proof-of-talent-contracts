@@ -18,11 +18,7 @@ import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.
  *
  * Skill Token amount = Cred Badge[0] * Weight[0] + Cred Badge[1] * Weight[1] + ... + Cred Badge[n] * Weight[n]
  **/
-contract SkillAttester is ISkillAttester, Attester, Ownable {
-  // The deployed contract will need to be authorized to write into the Attestation registry
-  // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
+contract SkillAttester is ISkillAttester, Attester {
   IERC1155 public immutable SKILL_BADGE;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
 
@@ -41,9 +37,7 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
     uint256 collectionIdFirst,
     uint256 collectionIdLast,
     address skillBadgeAddress
-  ) Attester(attestationsRegistryAddress) {
-    AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
-    AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
+  ) Attester(attestationsRegistryAddress, collectionIdFirst, collectionIdLast) {
     SKILL_BADGE = IERC1155(skillBadgeAddress);
   }
 
