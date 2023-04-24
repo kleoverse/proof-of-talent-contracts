@@ -1,12 +1,7 @@
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
-import {
-  AttestationsRegistry,
-  Badges,
-  SignatureAttester,
-  TransparentUpgradeableProxy__factory,
-} from '../../../../types';
+import { AttestationsRegistry, Badges, SignatureAttester } from '../../../../types';
 import { RequestStruct } from 'types/Attester';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -26,7 +21,6 @@ import {
 } from '../../../utils';
 import { getEventArgs } from '../../../utils/expectEvent';
 import { getAddress, parseEther } from 'ethers/lib/utils';
-import { getImplementation } from '../../../../utils';
 
 const config = deploymentsConfig[hre.network.name];
 const collectionIdFirst = BigNumber.from(config.signatureAttester.collectionIdFirst);
@@ -497,6 +491,20 @@ describe('Test Signature attester contract', () => {
       expect(args.attestation.owner).to.equal(BigNumber.from(source1.account).toHexString());
       expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(2));
       expect(args.attestation.value).to.equal(1);
+    });
+
+    it('non-owner should not be able to withdraw the payment', async () => {
+      await expect(signatureAttester.connect(randomSigner).withdrawFees()).to.be.revertedWith(
+        'Ownable: caller is not the owner'
+      );
+    });
+
+    it('owner should be able to withdraw the payment', async () => {
+      const balanceBefore = await hre.ethers.provider.getBalance(signatureAttester.address);
+      expect(balanceBefore).to.equal(parseEther('0.1'));
+      await signatureAttester.withdrawFees();
+      const balanceAfter = await hre.ethers.provider.getBalance(signatureAttester.address);
+      expect(balanceAfter).to.equal(0);
     });
   });
 

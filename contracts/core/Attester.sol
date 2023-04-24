@@ -247,4 +247,8 @@ abstract contract Attester is IAttester, Ownable {
       revert InsufficientMintingPrice(_badgeMintingPrice[collectionId], msg.value);
     }
   }
+
+  function withdrawFees() external onlyOwner {
+    payable(msg.sender).transfer(address(this).balance);
+  }
 }

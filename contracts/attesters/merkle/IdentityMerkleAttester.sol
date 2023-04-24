@@ -20,7 +20,16 @@ import {IAvailableRootsRegistry} from '../../periphery/utils/AvailableRootsRegis
  **/
 contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
   IAvailableRootsRegistry immutable AVAILABLE_ROOTS_REGISTRY;
+  address public immutable MIGRATION_CONTRACT;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
+
+  modifier onlyMigrationContractOrOwner() {
+    require(
+      msg.sender == MIGRATION_CONTRACT || msg.sender == owner(),
+      'Only migration contract or owner can call this function'
+    );
+    _;
+  }
 
   /*******************************************************
     INITIALIZATION FUNCTIONS                           
@@ -31,14 +40,17 @@ contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
    * @param availableRootsRegistryAddress Registry storing the available groups for this attester
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record
    * @param collectionIdLast Id of the last collection in which the attester is supposed to record
+   * @param migrationContract Address of the migration contract
    */
   constructor(
     address attestationsRegistryAddress,
     address availableRootsRegistryAddress,
     uint256 collectionIdFirst,
-    uint256 collectionIdLast
+    uint256 collectionIdLast,
+    address migrationContract
   ) Attester(attestationsRegistryAddress, collectionIdFirst, collectionIdLast) {
     AVAILABLE_ROOTS_REGISTRY = IAvailableRootsRegistry(availableRootsRegistryAddress);
+    MIGRATION_CONTRACT = migrationContract;
   }
 
   /*******************************************************
@@ -173,6 +185,14 @@ contract IdentityMerkleAttester is IIdentityMerkleAttester, Attester {
   /*******************************************************
     Identity Merkle Attester Specific Functions
   *******************************************************/
+
+  function setDestinationForSource(
+    uint256 attestationId,
+    address source,
+    address destination
+  ) external onlyMigrationContractOrOwner {
+    _setDestinationForSource(attestationId, source, destination);
+  }
 
   /**
    * @dev Getter, returns the last attestation's destination of a source

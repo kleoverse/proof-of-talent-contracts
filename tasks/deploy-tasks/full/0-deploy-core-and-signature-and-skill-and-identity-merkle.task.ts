@@ -84,6 +84,7 @@ async function deploymentAction(
     collectionIdLast: config.signatureAttester.collectionIdLast,
     attestationsRegistryAddress: attestationsRegistry.address,
     verifierAddress: config.signatureAttester.verifierAddress,
+    migrationContractAddress: config.signatureAttester.migrationContractAddress,
     options: { ...options, behindProxy: false },
   };
 
@@ -97,6 +98,7 @@ async function deploymentAction(
     collectionIdLast: config.identityMerkleAttester.collectionIdLast,
     attestationsRegistryAddress: attestationsRegistry.address,
     availableRootsRegistryAddress: availableRootsRegistry.address,
+    migrationContractAddress: config.identityMerkleAttester.migrationContractAddress,
     options: { ...options, behindProxy: false },
   };
 
@@ -110,6 +112,7 @@ async function deploymentAction(
     collectionIdLast: config.skillAttester.collectionIdLast,
     attestationsRegistryAddress: attestationsRegistry.address,
     skillBadgeAddress: skillBadge.address,
+    migrationContractAddress: config.skillAttester.migrationContractAddress,
     options: { ...options, behindProxy: false },
   };
 

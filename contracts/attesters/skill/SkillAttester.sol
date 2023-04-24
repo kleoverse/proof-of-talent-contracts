@@ -20,7 +20,16 @@ import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.
  **/
 contract SkillAttester is ISkillAttester, Attester {
   IERC1155 public immutable SKILL_BADGE;
+  address public immutable MIGRATION_CONTRACT;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
+
+  modifier onlyMigrationContractOrOwner() {
+    require(
+      msg.sender == MIGRATION_CONTRACT || msg.sender == owner(),
+      'Only migration contract or owner can call this function'
+    );
+    _;
+  }
 
   /*******************************************************
     INITIALIZATION FUNCTIONS                           
@@ -31,14 +40,17 @@ contract SkillAttester is ISkillAttester, Attester {
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record
    * @param collectionIdLast Id of the last collection in which the attester is supposed to record
    * @param skillBadgeAddress Skill Badge contract where the cred to skill weights are stored
+   * @param migrationContract Address of the migration contract
    */
   constructor(
     address attestationsRegistryAddress,
     uint256 collectionIdFirst,
     uint256 collectionIdLast,
-    address skillBadgeAddress
+    address skillBadgeAddress,
+    address migrationContract
   ) Attester(attestationsRegistryAddress, collectionIdFirst, collectionIdLast) {
     SKILL_BADGE = IERC1155(skillBadgeAddress);
+    MIGRATION_CONTRACT = migrationContract;
   }
 
   /*******************************************************
@@ -156,6 +168,14 @@ contract SkillAttester is ISkillAttester, Attester {
   /*******************************************************
     Skill Attester Specific Functions
   *******************************************************/
+
+  function setDestinationForSource(
+    uint256 attestationId,
+    address source,
+    address destination
+  ) external onlyMigrationContractOrOwner {
+    _setDestinationForSource(attestationId, source, destination);
+  }
 
   /**
    * @dev Getter, returns the last attestation's destination of a source

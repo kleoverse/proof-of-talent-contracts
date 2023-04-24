@@ -23,7 +23,16 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
     );
 
   address public immutable VERIFIER;
+  address public immutable MIGRATION_CONTRACT;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
+
+  modifier onlyMigrationContractOrOwner() {
+    require(
+      msg.sender == MIGRATION_CONTRACT || msg.sender == owner(),
+      'Only migration contract or owner can call this function'
+    );
+    _;
+  }
 
   /*******************************************************
     INITIALIZATION FUNCTIONS                           
@@ -34,17 +43,20 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record
    * @param collectionIdLast Id of the last collection in which the attester is supposed to record
    * @param verifierAddress Address of the off-chain attester signer
+   * @param migrationContract Address of the migration contract
    */
   constructor(
     address attestationsRegistryAddress,
     uint256 collectionIdFirst,
     uint256 collectionIdLast,
-    address verifierAddress
+    address verifierAddress,
+    address migrationContract
   )
     Attester(attestationsRegistryAddress, collectionIdFirst, collectionIdLast)
     EIP712('SignatureAttester', '1')
   {
     VERIFIER = verifierAddress;
+    MIGRATION_CONTRACT = migrationContract;
   }
 
   /*******************************************************
@@ -177,6 +189,14 @@ contract SignatureAttester is ISignatureAttester, Attester, EIP712 {
   /*******************************************************
     Signature Attester Specific Functions
   *******************************************************/
+
+  function setDestinationForSource(
+    uint256 attestationId,
+    address source,
+    address destination
+  ) external onlyMigrationContractOrOwner {
+    _setDestinationForSource(attestationId, source, destination);
+  }
 
   /**
    * @dev Getter, returns the last attestation's destination of a source

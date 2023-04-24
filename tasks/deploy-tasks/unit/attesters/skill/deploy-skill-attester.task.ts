@@ -18,6 +18,7 @@ export interface DeploySkillAttesterArgs {
   collectionIdFirst: BigNumberish;
   collectionIdLast: BigNumberish;
   skillBadgeAddress: string;
+  migrationContractAddress: string;
   options?: DeployOptions;
 }
 
@@ -33,6 +34,7 @@ async function deploymentAction(
     collectionIdFirst = 100,
     collectionIdLast = 0,
     skillBadgeAddress,
+    migrationContractAddress,
     options,
   }: DeploySkillAttesterArgs,
   hre: HardhatRuntimeEnvironment
@@ -45,6 +47,7 @@ async function deploymentAction(
     BigNumber.from(collectionIdFirst),
     BigNumber.from(collectionIdLast),
     skillBadgeAddress,
+    migrationContractAddress,
   ];
 
   await beforeDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, options);
@@ -60,6 +63,7 @@ async function deploymentAction(
     {
       ...options,
       proxyData: initData,
+      behindProxy: false,
     }
   );
 
@@ -74,4 +78,5 @@ task('deploy-skill-attester')
   .addParam('collectionIdLast', '')
   .addParam('attestationsRegistryAddress', 'Address of the attestations contract')
   .addParam('skillBadgeAddress', 'Address of the skill badge contract')
+  .addParam('migrationContractAddress', 'Address of the migration contract')
   .setAction(wrapCommonDeployOptions(deploymentAction));

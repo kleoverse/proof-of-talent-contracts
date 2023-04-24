@@ -45,14 +45,17 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
       verifierAddress: ALPHA_POLYGON_VERIFIER,
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     skillAttester: {
       collectionIdFirst: '10000001',
       collectionIdLast: '20000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     identityMerkleAttester: {
       collectionIdFirst: '20000001',
       collectionIdLast: '30000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     hydraS1SimpleAttester: {
       collectionIdFirst: '30000001',
@@ -102,14 +105,17 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
       verifierAddress: ALPHA_RINKEBY_VERIFIER,
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     skillAttester: {
       collectionIdFirst: '10000001',
       collectionIdLast: '20000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     identityMerkleAttester: {
       collectionIdFirst: '20000001',
       collectionIdLast: '30000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     hydraS1SimpleAttester: {
       collectionIdFirst: '30000001',
@@ -157,14 +163,17 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
       verifierAddress: ALPHA_RINKEBY_VERIFIER,
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     skillAttester: {
       collectionIdFirst: '10000001',
       collectionIdLast: '20000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     identityMerkleAttester: {
       collectionIdFirst: '20000001',
       collectionIdLast: '30000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     hydraS1SimpleAttester: {
       collectionIdFirst: '30000001',
@@ -213,14 +222,17 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
       verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     skillAttester: {
       collectionIdFirst: '10000001',
       collectionIdLast: '20000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     identityMerkleAttester: {
       collectionIdFirst: '20000001',
       collectionIdLast: '30000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     hydraS1SimpleAttester: {
       collectionIdFirst: '30000001',
@@ -269,14 +281,17 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
       verifierAddress: '0xb01ee322C4f028B8A6BFcD2a5d48107dc5bC99EC',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     skillAttester: {
       collectionIdFirst: '10000001',
       collectionIdLast: '20000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     identityMerkleAttester: {
       collectionIdFirst: '20000001',
       collectionIdLast: '30000000',
+      migrationContractAddress: ethers.constants.AddressZero,
     },
     hydraS1SimpleAttester: {
       collectionIdFirst: '30000001',

@@ -57,6 +57,8 @@
     "eslint": "^8.14.0",
     "ethers": "^5.6.8",
     "fast-glob": "^3.2.11",
+    "graphql": "^16.6.0",
+    "graphql-request": "^6.0.0",
     "hardhat": "^2.9.7",
     "hardhat-storage-layout": "^0.1.6",
     "husky": "4.2.5",
