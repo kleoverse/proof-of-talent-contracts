@@ -251,4 +251,8 @@ abstract contract Attester is IAttester, Ownable {
   function withdrawFees() external onlyOwner {
     payable(msg.sender).transfer(address(this).balance);
   }
+
+  function getBadgeMintingPrice(uint256 collectionId) external view returns (uint64) {
+    return _badgeMintingPrice[collectionId];
+  }
 }

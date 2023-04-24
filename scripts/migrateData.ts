@@ -13,8 +13,8 @@ const config = {
         migrationContractAddress: "0x42c4eD81eF8cB904224C0e2265d5e214628E7c38",
         signatureAttesterAddressOld: "0xeE9Cc5630F1d1d17d2EA232ca12ff52c4a099920",
         skillAttesterAddressOld: "0xD94fF43dF23540e9e06F56F36e7fe54565aEB483",
-        signatureAttesterAddressNew: "0x1e78DFa7AF3a968e8cBeA836888544B2b4afF871",
-        skillAttesterAddressNew: "0x65059e157a5948E7B5Aad38Da4eE63A8dB40fc34",
+        signatureAttesterAddressNew: "0x1f8b5b01e094AEd6bF80574124C7f8C6C43ceC92",
+        skillAttesterAddressNew: "0xAD6176Fe096Af5A20A333E841c58fD593A8D3A9f",
     },
     polygon: {
         rpcUrl: process.env.POLYGON_RPC_URL,
@@ -22,8 +22,8 @@ const config = {
         migrationContractAddress: "0xf125D0cb945EF0E7F171062351C71ba9D90A865F",
         signatureAttesterAddressOld: "0x8f4c102875AFb6152004f8e87cF1cBF90431Df54",
         skillAttesterAddressOld: "0xAD6176Fe096Af5A20A333E841c58fD593A8D3A9f",
-        signatureAttesterAddressNew: "0x40b4b0464512203f3755ddD9865ddE7dBfA1f6C3",
-        skillAttesterAddressNew: "0xE9E455aB82b441b492f5eA96d1F99DBD29229F9F",
+        signatureAttesterAddressNew: "0xdB39b517258447BD94DB54b2ec8AbbA1694e3b6c",
+        skillAttesterAddressNew: "0xAAB9fA45b5A2eaffa2CF1cC1BA512D3E1e23374d",
     },
 };
 

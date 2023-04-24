@@ -479,7 +479,7 @@ describe('Test Signature attester contract', () => {
         [v, r, s, deadline]
       );
       const tx = await signatureAttester.generateAttestations(requestPaidBadge, data, {
-        value: parseEther('0.1'),
+        value: await signatureAttester.getBadgeMintingPrice(collectionIdFirst.add(2)),
       });
       const { events } = await tx.wait();
       const args = getEventArgs(events, 'AttestationGenerated');
