@@ -10,7 +10,6 @@ interface IIdentityMerkleAttester {
   error IdentityDoesNotExist();
   error IdentityInvalid();
   error BadgeInvalid();
-  error CollectionIdOutOfBound(uint256 collectionId);
   error NotAttestationOwner(uint256 collectionId, address sender);
   error SourceDestinationNotSame(address source, address destination);
 

@@ -84,7 +84,8 @@ async function deploymentAction(
     collectionIdLast: config.signatureAttester.collectionIdLast,
     attestationsRegistryAddress: attestationsRegistry.address,
     verifierAddress: config.signatureAttester.verifierAddress,
-    options,
+    migrationContractAddress: config.signatureAttester.migrationContractAddress,
+    options: { ...options, behindProxy: false },
   };
 
   const { signatureAttester } = (await hre.run(
@@ -97,7 +98,8 @@ async function deploymentAction(
     collectionIdLast: config.identityMerkleAttester.collectionIdLast,
     attestationsRegistryAddress: attestationsRegistry.address,
     availableRootsRegistryAddress: availableRootsRegistry.address,
-    options,
+    migrationContractAddress: config.identityMerkleAttester.migrationContractAddress,
+    options: { ...options, behindProxy: false },
   };
 
   const { identityMerkleAttester } = (await hre.run(
@@ -110,7 +112,8 @@ async function deploymentAction(
     collectionIdLast: config.skillAttester.collectionIdLast,
     attestationsRegistryAddress: attestationsRegistry.address,
     skillBadgeAddress: skillBadge.address,
-    options,
+    migrationContractAddress: config.skillAttester.migrationContractAddress,
+    options: { ...options, behindProxy: false },
   };
 
   const { skillAttester } = (await hre.run(
@@ -239,7 +242,7 @@ async function deploymentAction(
 
     * SkillAttester:
       -> proxy: ${(await hre.deployments.all()).SkillAttester.address}
-      -> implem: ${(await hre.deployments.all()).SkillAttesterImplem.address}
+      -> implem: ${(await hre.deployments.all()).SkillAttester.address}
       collectionIdFirst: ${config.skillAttester.collectionIdFirst}
       collectionIdLast: ${config.skillAttester.collectionIdLast}
     

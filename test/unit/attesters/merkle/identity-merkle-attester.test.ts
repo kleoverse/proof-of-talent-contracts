@@ -110,7 +110,7 @@ describe('Test Identity Merkle attester contract', () => {
         signatureAttester,
         identityMerkleAttester,
         availableRootsRegistry,
-      } = (await hre.run('0-deploy-core-and-hydra-s1-simple-and-soulbound', {
+      } = (await hre.run('0-deploy-core-and-signature-and-skill-and-identity-merkle', {
         options: { log: false },
       })) as Deployed0);
       root = accountsTree1.getHexRoot();

@@ -1,12 +1,7 @@
 import { expect } from 'chai';
 import hre, { ethers } from 'hardhat';
 import { recoverTypedSignature, SignTypedDataVersion } from '@metamask/eth-sig-util';
-import {
-  AttestationsRegistry,
-  Badges,
-  SignatureAttester,
-  TransparentUpgradeableProxy__factory,
-} from '../../../../types';
+import { AttestationsRegistry, Badges, SignatureAttester } from '../../../../types';
 import { RequestStruct } from 'types/Attester';
 
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
@@ -25,8 +20,7 @@ import {
   SignatureGroup,
 } from '../../../utils';
 import { getEventArgs } from '../../../utils/expectEvent';
-import { getAddress } from 'ethers/lib/utils';
-import { getImplementation } from '../../../../utils';
+import { getAddress, parseEther } from 'ethers/lib/utils';
 
 const config = deploymentsConfig[hre.network.name];
 const collectionIdFirst = BigNumber.from(config.signatureAttester.collectionIdFirst);
@@ -55,6 +49,7 @@ describe('Test Signature attester contract', () => {
   let source1Value: number;
   let group1: SignatureGroup;
   let group2: SignatureGroup;
+  let group3: SignatureGroup;
 
   // Valid request and proof
   let request: RequestStruct;
@@ -75,6 +70,7 @@ describe('Test Signature attester contract', () => {
 
     group1 = groups[0];
     group2 = groups[1];
+    group3 = groups[2];
     source1Value = group1.data[source1.identifier];
   });
 
@@ -85,7 +81,7 @@ describe('Test Signature attester contract', () => {
   describe('Deployments', () => {
     it('Should deploy and setup core', async () => {
       ({ attestationsRegistry, badges, signatureAttester } = (await hre.run(
-        '0-deploy-core-and-hydra-s1-simple-and-soulbound',
+        '0-deploy-core-and-signature-and-skill-and-identity-merkle',
         {
           options: { log: false },
         }
@@ -419,6 +415,99 @@ describe('Test Signature attester contract', () => {
     });
   });
 
+  describe('Verify payment', () => {
+    it('Should revert due to insufficient payment', async () => {
+      const deadline = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+      console.log(await signatureAttester.owner());
+      console.log(deployer.address);
+      const collectionIds = [collectionIdFirst.add(2)];
+      const priceList = [parseEther('0.1')];
+      await signatureAttester.connect(deployer).setBadgeMintingPrice(collectionIds, priceList);
+
+      const requestPaidBadge = {
+        claims: [
+          {
+            groupId: group3.id,
+            claimedValue: source1Value,
+            extraData: encodeSignatureGroupProperties(group3.properties),
+          },
+        ],
+        destination: source1.account,
+      };
+
+      const signData = generateEIP712TypedSignData(
+        requestPaidBadge,
+        signatureAttester.address,
+        deadline,
+        SignatureAttesterDomainName
+      );
+      const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
+      const { r, s, v } = utils.splitSignature(sig);
+      const data = ethers.utils.defaultAbiCoder.encode(
+        ['uint8', 'bytes32', 'bytes32', 'uint256'],
+        [v, r, s, deadline]
+      );
+      await expect(signatureAttester.generateAttestations(requestPaidBadge, data))
+        .to.be.revertedWithCustomError(signatureAttester, `InsufficientMintingPrice`)
+        .withArgs(parseEther('0.1'), parseEther('0'));
+    });
+    it('Should generate attestation after sufficient payment', async () => {
+      const deadline = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+
+      const requestPaidBadge = {
+        claims: [
+          {
+            groupId: group3.id,
+            claimedValue: source1Value,
+            extraData: encodeSignatureGroupProperties(group3.properties),
+          },
+        ],
+        destination: source1.account,
+      };
+
+      const signData = generateEIP712TypedSignData(
+        requestPaidBadge,
+        signatureAttester.address,
+        deadline,
+        SignatureAttesterDomainName
+      );
+      const sig = await deployer._signTypedData(signData.domain, signData.types, signData.message);
+      const { r, s, v } = utils.splitSignature(sig);
+      const data = ethers.utils.defaultAbiCoder.encode(
+        ['uint8', 'bytes32', 'bytes32', 'uint256'],
+        [v, r, s, deadline]
+      );
+      const tx = await signatureAttester.generateAttestations(requestPaidBadge, data, {
+        value: parseEther('0.1'),
+      });
+      const { events } = await tx.wait();
+      const args = getEventArgs(events, 'AttestationGenerated');
+
+      console.log(tx);
+      console.log('deployer: ', deployer.address);
+      console.log('dest: ', source1.account);
+      expect(args.attestation.issuer).to.equal(signatureAttester.address);
+      expect(args.attestation.owner).to.equal(BigNumber.from(source1.account).toHexString());
+      expect(args.attestation.collectionId).to.equal(collectionIdFirst.add(2));
+      expect(args.attestation.value).to.equal(1);
+    });
+
+    it('non-owner should not be able to withdraw the payment', async () => {
+      await expect(signatureAttester.connect(randomSigner).withdrawFees()).to.be.revertedWith(
+        'Ownable: caller is not the owner'
+      );
+    });
+
+    it('owner should be able to withdraw the payment', async () => {
+      const balanceBefore = await hre.ethers.provider.getBalance(signatureAttester.address);
+      expect(balanceBefore).to.equal(parseEther('0.1'));
+      await signatureAttester.withdrawFees();
+      const balanceAfter = await hre.ethers.provider.getBalance(signatureAttester.address);
+      expect(balanceAfter).to.equal(0);
+    });
+  });
+
   /*************************************************************************************/
   /************************** BEFORE RECORD ATTESTATION ********************************/
   /*************************************************************************************/
@@ -490,32 +579,32 @@ describe('Test Signature attester contract', () => {
   /*************************************************************************************/
   /******************************* UPDATE IMPLEMENTATION *******************************/
   /*************************************************************************************/
-  describe('Update implementation', () => {
-    it('Should update the implementation', async () => {
-      const proxyAdminSigner = await ethers.getSigner(
-        deploymentsConfig[hre.network.name].deployOptions.proxyAdmin as string
-      );
+  // describe('Update implementation', () => {
+  //   it('Should update the implementation', async () => {
+  //     const proxyAdminSigner = await ethers.getSigner(
+  //       deploymentsConfig[hre.network.name].deployOptions.proxyAdmin as string
+  //     );
 
-      const { signatureAttester: newSignatureAttester } = await hre.run(
-        'deploy-signature-attester',
-        {
-          collectionIdFirst: config.signatureAttester.collectionIdFirst,
-          collectionIdLast: config.signatureAttester.collectionIdLast,
-          attestationsRegistryAddress: attestationsRegistry.address,
-          verifierAddress: config.signatureAttester.verifierAddress,
-          options: { behindProxy: false },
-        }
-      );
+  //     const { signatureAttester: newSignatureAttester } = await hre.run(
+  //       'deploy-signature-attester',
+  //       {
+  //         collectionIdFirst: config.signatureAttester.collectionIdFirst,
+  //         collectionIdLast: config.signatureAttester.collectionIdLast,
+  //         attestationsRegistryAddress: attestationsRegistry.address,
+  //         verifierAddress: config.signatureAttester.verifierAddress,
+  //         options: { behindProxy: false },
+  //       }
+  //     );
 
-      const signatureAttesterProxy = TransparentUpgradeableProxy__factory.connect(
-        signatureAttester.address,
-        proxyAdminSigner
-      );
+  //     const signatureAttesterProxy = TransparentUpgradeableProxy__factory.connect(
+  //       signatureAttester.address,
+  //       proxyAdminSigner
+  //     );
 
-      await (await signatureAttesterProxy.upgradeTo(newSignatureAttester.address)).wait();
+  //     await (await signatureAttesterProxy.upgradeTo(newSignatureAttester.address)).wait();
 
-      const implementationAddress = await getImplementation(signatureAttesterProxy);
-      expect(implementationAddress).to.eql(newSignatureAttester.address);
-    });
-  });
+  //     const implementationAddress = await getImplementation(signatureAttesterProxy);
+  //     expect(implementationAddress).to.eql(newSignatureAttester.address);
+  //   });
+  // });
 });

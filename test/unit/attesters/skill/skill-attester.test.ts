@@ -103,7 +103,7 @@ describe('Test Skill attester contract', () => {
       } as DeployMockSkillBadgeArgs)) as DeployedMockSkillBadge);
 
       ({ attestationsRegistry } = (await hre.run(
-        '0-deploy-core-and-hydra-s1-simple-and-soulbound',
+        '0-deploy-core-and-signature-and-skill-and-identity-merkle',
         {
           options: { log: false },
         }
@@ -113,6 +113,7 @@ describe('Test Skill attester contract', () => {
         collectionIdLast: config.skillAttester.collectionIdLast,
         attestationsRegistryAddress: attestationsRegistry.address,
         skillBadgeAddress: mockSkillBadge.address,
+        migrationContractAddress: config.skillAttester.migrationContractAddress,
       }));
       await hre.run('attestations-registry-authorize-range', {
         attestationsRegistryAddress: attestationsRegistry.address,
@@ -289,29 +290,29 @@ describe('Test Skill attester contract', () => {
   /*************************************************************************************/
   /******************************* UPDATE IMPLEMENTATION *******************************/
   /*************************************************************************************/
-  describe('Update implementation', () => {
-    it('Should update the implementation', async () => {
-      const proxyAdminSigner = await ethers.getSigner(
-        deploymentsConfig[hre.network.name].deployOptions.proxyAdmin as string
-      );
+  // describe('Update implementation', () => {
+  //   it('Should update the implementation', async () => {
+  //     const proxyAdminSigner = await ethers.getSigner(
+  //       deploymentsConfig[hre.network.name].deployOptions.proxyAdmin as string
+  //     );
 
-      const { skillAttester: newSkillAttester } = await hre.run('deploy-skill-attester', {
-        collectionIdFirst: config.skillAttester.collectionIdFirst,
-        collectionIdLast: config.skillAttester.collectionIdLast,
-        attestationsRegistryAddress: attestationsRegistry.address,
-        skillBadgeAddress: mockSkillBadge.address,
-        options: { behindProxy: false },
-      });
+  //     const { skillAttester: newSkillAttester } = await hre.run('deploy-skill-attester', {
+  //       collectionIdFirst: config.skillAttester.collectionIdFirst,
+  //       collectionIdLast: config.skillAttester.collectionIdLast,
+  //       attestationsRegistryAddress: attestationsRegistry.address,
+  //       skillBadgeAddress: mockSkillBadge.address,
+  //       options: { behindProxy: false },
+  //     });
 
-      const skillAttesterProxy = TransparentUpgradeableProxy__factory.connect(
-        skillAttester.address,
-        proxyAdminSigner
-      );
+  //     const skillAttesterProxy = TransparentUpgradeableProxy__factory.connect(
+  //       skillAttester.address,
+  //       proxyAdminSigner
+  //     );
 
-      await (await skillAttesterProxy.upgradeTo(newSkillAttester.address)).wait();
+  //     await (await skillAttesterProxy.upgradeTo(newSkillAttester.address)).wait();
 
-      const implementationAddress = await getImplementation(skillAttesterProxy);
-      expect(implementationAddress).to.eql(newSkillAttester.address);
-    });
-  });
+  //     const implementationAddress = await getImplementation(skillAttesterProxy);
+  //     expect(implementationAddress).to.eql(newSkillAttester.address);
+  //   });
+  // });
 });

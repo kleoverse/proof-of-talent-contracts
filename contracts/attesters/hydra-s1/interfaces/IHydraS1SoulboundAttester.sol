@@ -19,7 +19,6 @@ interface IHydraS1SoulboundAttester is IHydraS1Base, IAttester {
   error NotAttestationOwner(uint256 ticket, address sender);
   error TicketFrozen(uint256 ticketData);
   error TicketUsedAndOnCooldown(TicketData ticketData);
-  error CollectionIdOutOfBound(uint256 collectionId);
 
   event TicketDestinationUpdated(uint256 ticket, address newOwner);
   event TicketSetOnCooldown(uint256 ticket);
@@ -42,17 +41,17 @@ interface IHydraS1SoulboundAttester is IHydraS1Base, IAttester {
    **/
   function getDestinationOfTicket(uint256 userTicket) external view returns (address);
 
-  /**
-   * @dev Getter
-   * returns of the first collection in which the attester is supposed to record
-   **/
-  function AUTHORIZED_COLLECTION_ID_FIRST() external view returns (uint256);
+  // /**
+  //  * @dev Getter
+  //  * returns of the first collection in which the attester is supposed to record
+  //  **/
+  // function AUTHORIZED_COLLECTION_ID_FIRST() external view returns (uint256);
 
-  /**
-   * @dev Getter
-   * returns of the last collection in which the attester is supposed to record
-   **/
-  function AUTHORIZED_COLLECTION_ID_LAST() external view returns (uint256);
+  // /**
+  //  * @dev Getter
+  //  * returns of the last collection in which the attester is supposed to record
+  //  **/
+  // function AUTHORIZED_COLLECTION_ID_LAST() external view returns (uint256);
 
   /**
    * @dev Getter

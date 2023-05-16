@@ -18,13 +18,18 @@ import {Attester, IAttester, IAttestationsRegistry} from './../../core/Attester.
  *
  * Skill Token amount = Cred Badge[0] * Weight[0] + Cred Badge[1] * Weight[1] + ... + Cred Badge[n] * Weight[n]
  **/
-contract SkillAttester is ISkillAttester, Attester, Ownable {
-  // The deployed contract will need to be authorized to write into the Attestation registry
-  // It should get write access on attestation collections from AUTHORIZED_COLLECTION_ID_FIRST to AUTHORIZED_COLLECTION_ID_LAST.
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_FIRST;
-  uint256 public immutable AUTHORIZED_COLLECTION_ID_LAST;
+contract SkillAttester is ISkillAttester, Attester {
   IERC1155 public immutable SKILL_BADGE;
+  address public immutable MIGRATION_CONTRACT;
   mapping(uint256 => mapping(address => address)) internal _sourcesToDestinations;
+
+  modifier onlyMigrationContractOrOwner() {
+    require(
+      msg.sender == MIGRATION_CONTRACT || msg.sender == owner(),
+      'Only migration contract or owner can call this function'
+    );
+    _;
+  }
 
   /*******************************************************
     INITIALIZATION FUNCTIONS                           
@@ -35,16 +40,17 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
    * @param collectionIdFirst Id of the first collection in which the attester is supposed to record
    * @param collectionIdLast Id of the last collection in which the attester is supposed to record
    * @param skillBadgeAddress Skill Badge contract where the cred to skill weights are stored
+   * @param migrationContract Address of the migration contract
    */
   constructor(
     address attestationsRegistryAddress,
     uint256 collectionIdFirst,
     uint256 collectionIdLast,
-    address skillBadgeAddress
-  ) Attester(attestationsRegistryAddress) {
-    AUTHORIZED_COLLECTION_ID_FIRST = collectionIdFirst;
-    AUTHORIZED_COLLECTION_ID_LAST = collectionIdLast;
+    address skillBadgeAddress,
+    address migrationContract
+  ) Attester(attestationsRegistryAddress, collectionIdFirst, collectionIdLast) {
     SKILL_BADGE = IERC1155(skillBadgeAddress);
+    MIGRATION_CONTRACT = migrationContract;
   }
 
   /*******************************************************
@@ -162,6 +168,14 @@ contract SkillAttester is ISkillAttester, Attester, Ownable {
   /*******************************************************
     Skill Attester Specific Functions
   *******************************************************/
+
+  function setDestinationForSource(
+    uint256 attestationId,
+    address source,
+    address destination
+  ) external onlyMigrationContractOrOwner {
+    _setDestinationForSource(attestationId, source, destination);
+  }
 
   /**
    * @dev Getter, returns the last attestation's destination of a source

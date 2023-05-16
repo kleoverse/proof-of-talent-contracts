@@ -31,14 +31,17 @@ export type DeploymentsConfigTypes = {
       collectionIdFirst: string;
       collectionIdLast: string;
       verifierAddress: string;
+      migrationContractAddress: string;
     };
     identityMerkleAttester: {
       collectionIdFirst: string;
       collectionIdLast: string;
+      migrationContractAddress: string;
     };
     skillAttester: {
       collectionIdFirst: string;
       collectionIdLast: string;
+      migrationContractAddress: string;
     };
     skillBadge: {
       uri: string;

@@ -18,6 +18,7 @@ export interface DeployIdentityMerkleAttesterArgs {
   availableRootsRegistryAddress: string;
   collectionIdFirst: BigNumberish;
   collectionIdLast: BigNumberish;
+  migrationContractAddress: string;
   options?: DeployOptions;
 }
 
@@ -33,6 +34,7 @@ async function deploymentAction(
     availableRootsRegistryAddress,
     collectionIdFirst = 100,
     collectionIdLast = 0,
+    migrationContractAddress,
     options,
   }: DeployIdentityMerkleAttesterArgs,
   hre: HardhatRuntimeEnvironment
@@ -45,6 +47,7 @@ async function deploymentAction(
     availableRootsRegistryAddress,
     BigNumber.from(collectionIdFirst),
     BigNumber.from(collectionIdLast),
+    migrationContractAddress,
   ];
 
   await beforeDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, options);
@@ -61,6 +64,7 @@ async function deploymentAction(
     {
       ...options,
       proxyData: initData,
+      behindProxy: false,
     }
   );
 
@@ -78,4 +82,5 @@ task('deploy-identity-merkle-attester')
   .addParam('collectionIdLast', '')
   .addParam('attestationsRegistryAddress', 'Address of the attestations contract')
   .addParam('availableRootsRegistryAddress', 'address of the registryMerkleRoot contract')
+  .addParam('migrationContractAddress', 'Address of the migration contract')
   .setAction(wrapCommonDeployOptions(deploymentAction));

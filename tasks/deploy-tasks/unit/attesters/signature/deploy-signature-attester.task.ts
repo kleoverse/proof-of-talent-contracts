@@ -21,6 +21,7 @@ export interface DeploySignatureAttesterArgs {
   collectionIdFirst: BigNumberish;
   collectionIdLast: BigNumberish;
   verifierAddress: string;
+  migrationContractAddress: string;
   options?: DeployOptions;
 }
 
@@ -36,6 +37,7 @@ async function deploymentAction(
     collectionIdFirst = 100,
     collectionIdLast = 0,
     verifierAddress,
+    migrationContractAddress,
     options,
   }: DeploySignatureAttesterArgs,
   hre: HardhatRuntimeEnvironment
@@ -48,6 +50,7 @@ async function deploymentAction(
     BigNumber.from(collectionIdFirst),
     BigNumber.from(collectionIdLast),
     verifierAddress,
+    migrationContractAddress,
   ];
 
   await beforeDeployment(hre, deployer, CONTRACT_NAME, deploymentArgs, options);
@@ -63,6 +66,7 @@ async function deploymentAction(
     {
       ...options,
       proxyData: initData,
+      behindProxy: false,
     }
   );
 
@@ -77,4 +81,5 @@ task('deploy-signature-attester')
   .addParam('collectionIdLast', '')
   .addParam('attestationsRegistryAddress', 'Address of the attestations contract')
   .addParam('verifierAddress', 'Address of the verifier')
+  .addParam('migrationContractAddress', 'Address of the migration contract')
   .setAction(wrapCommonDeployOptions(deploymentAction));
