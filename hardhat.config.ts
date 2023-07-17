@@ -16,6 +16,7 @@ import 'solidity-coverage';
 import 'hardhat-deploy';
 import { Wallet } from 'ethers';
 import fg from 'fast-glob';
+import { network } from 'hardhat';
 
 dotenv.config();
 
@@ -41,6 +42,15 @@ const ALCHEMY_KEY = process.env.ALCHEMY_KEY || '';
 const MAINNET_FORK = process.env.MAINNET_FORK === 'true';
 const FORKING_BLOCK = parseInt(process.env.FORKING_BLOCK || '');
 
+let privateKey;
+const getPrivateKey = (networkName: string) => {
+  if (networkName === 'polygon') {
+    return process.env.POLYGON_PRIVATE_KEY;
+  } else if (networkName === 'goerli') {
+    return process.env.RINKEBY_PRIVATE_KEY;
+  }
+};
+
 const mainnetFork =
   MAINNET_FORK && FORKING_BLOCK
     ? {
@@ -55,7 +65,12 @@ const getCommonNetworkConfig = (networkName: string, networkId: number) => ({
   url: NETWORKS_RPC_URL[networkName] ?? '',
   // hardfork: HARDFORK,
   chainId: networkId,
-  accounts: [ process.env.POLYGON_PRIVATE_KEY_MAIN || process.env.RINKEBY_PRIVATE_KEY || Wallet.createRandom().privateKey, Wallet.fromMnemonic(MNEMONIC).privateKey]
+
+  accounts: [
+    getPrivateKey(networkName) ||
+    process.env.RINKEBY_PRIVATE_KEY || Wallet.createRandom().privateKey,
+    Wallet.fromMnemonic(MNEMONIC).privateKey,
+  ],
   // accounts: {
   //   mnemonic: MNEMONIC,
   //   path: MNEMONIC_PATH,
