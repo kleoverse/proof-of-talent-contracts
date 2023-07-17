@@ -46,7 +46,7 @@ let privateKey;
 const getPrivateKey = (networkName: string) => {
   if (networkName === 'polygon') {
     return process.env.POLYGON_PRIVATE_KEY;
-  } else if (networkName === 'goerli') {
+  } else if (networkName === 'goerli' || networkName === 'mumbai') {
     return process.env.RINKEBY_PRIVATE_KEY;
   }
 };

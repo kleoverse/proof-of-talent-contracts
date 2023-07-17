@@ -89,6 +89,64 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
   },
   // owners: 0xb8b85903f5c2f5506abb7ad2bcbd646b89e308a4 is the signer1
   // of the "dev-staging-rinkeby-mnemonic"
+  mumbai: {
+    deployOptions: {
+      manualConfirm: false,
+      log: true,
+      behindProxy: true,
+      proxyAdmin: ALPHA_GOERLI_PROXY_ADMIN,
+    },
+    badges: {
+      owner: ALPHA_GOERLI_OWNER,
+      // Badges Metadata URI for the Badges contract
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/rinkeby/metadata/{id}.json',
+    },
+    signatureAttester: {
+      collectionIdFirst: '0',
+      collectionIdLast: '10000000',
+      verifierAddress: ALPHA_GOERLI_VERIFIER,
+      migrationContractAddress: ethers.constants.AddressZero,
+    },
+    skillAttester: {
+      collectionIdFirst: '10000001',
+      collectionIdLast: '20000000',
+      migrationContractAddress: ethers.constants.AddressZero,
+    },
+    identityMerkleAttester: {
+      collectionIdFirst: '20000001',
+      collectionIdLast: '30000000',
+      migrationContractAddress: ethers.constants.AddressZero,
+    },
+    hydraS1SimpleAttester: {
+      collectionIdFirst: '30000001',
+      collectionIdLast: '40000000',
+      initialRoot: '0x0deb3822cd7d8c6ece7456c8e7ff81d61c8991390072f2cee0f711102741e259',
+    },
+    hydraS1SoulboundAttester: {
+      collectionIdFirst: '40000001',
+      collectionIdLast: '50000000',
+      soulboundCooldownDuration: THREE_DAYS, // 3 days
+      initialRoot: '0',
+    },
+    front: {
+      collectionIdFirst: '50000001',
+      collectionIdLast: '60000000',
+    },
+    skillBadge: {
+      uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/rinkeby/metadata/{id}.json',
+    },
+    attestationsRegistry: {
+      owner: ALPHA_GOERLI_OWNER,
+    },
+    availableRootsRegistry: {
+      owner: ALPHA_GOERLI_ROOTS_OWNER_RELAYER,
+    },
+    commitmentMapper: {
+      owner: ALPHA_GOERLI_OWNER,
+      EdDSAPubKeyX: COMMITMENT_MAPPER_EDDSA_PUB_KEY_STAGING[0],
+      EdDSAPubKeyY: COMMITMENT_MAPPER_EDDSA_PUB_KEY_STAGING[1],
+    },
+  },
   rinkeby: {
     deployOptions: {
       manualConfirm: false,
