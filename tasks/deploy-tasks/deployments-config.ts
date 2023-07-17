@@ -18,10 +18,10 @@ const COMMITMENT_MAPPER_TESTER = [
 
 const THREE_DAYS = '295200';
 // Rinkeby
-const ALPHA_RINKEBY_OWNER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
-const ALPHA_RINKEBY_ROOTS_OWNER_RELAYER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
-const ALPHA_RINKEBY_PROXY_ADMIN = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
-const ALPHA_RINKEBY_VERIFIER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
+const ALPHA_GOERLI_OWNER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
+const ALPHA_GOERLI_ROOTS_OWNER_RELAYER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
+const ALPHA_GOERLI_PROXY_ADMIN = '0xA02CDdFa44B8C01b4257F54ac1c43F75801E8175';
+const ALPHA_GOERLI_VERIFIER = '0x1Fe64E7E5ce645a751c239f9F656b136F41D4aE0';
 // Polygon
 const ALPHA_POLYGON_OWNER = '0xe5c7bd50c532C518Fc2613C2934Bd2003940298C';
 const ALPHA_POLYGON_ROOTS_OWNER_RELAYER = '0xe5c7bd50c532C518Fc2613C2934Bd2003940298C';
@@ -94,17 +94,17 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       manualConfirm: false,
       log: true,
       behindProxy: true,
-      proxyAdmin: ALPHA_RINKEBY_PROXY_ADMIN,
+      proxyAdmin: ALPHA_GOERLI_PROXY_ADMIN,
     },
     badges: {
-      owner: ALPHA_RINKEBY_OWNER,
+      owner: ALPHA_GOERLI_OWNER,
       // Badges Metadata URI for the Badges contract
       uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/rinkeby/metadata/{id}.json',
     },
     signatureAttester: {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
-      verifierAddress: ALPHA_RINKEBY_VERIFIER,
+      verifierAddress: ALPHA_GOERLI_VERIFIER,
       migrationContractAddress: ethers.constants.AddressZero,
     },
     skillAttester: {
@@ -136,13 +136,13 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/rinkeby/metadata/{id}.json',
     },
     attestationsRegistry: {
-      owner: ALPHA_RINKEBY_OWNER,
+      owner: ALPHA_GOERLI_OWNER,
     },
     availableRootsRegistry: {
-      owner: ALPHA_RINKEBY_ROOTS_OWNER_RELAYER,
+      owner: ALPHA_GOERLI_ROOTS_OWNER_RELAYER,
     },
     commitmentMapper: {
-      owner: ALPHA_RINKEBY_OWNER,
+      owner: ALPHA_GOERLI_OWNER,
       EdDSAPubKeyX: COMMITMENT_MAPPER_EDDSA_PUB_KEY_STAGING[0],
       EdDSAPubKeyY: COMMITMENT_MAPPER_EDDSA_PUB_KEY_STAGING[1],
     },
@@ -152,17 +152,17 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       manualConfirm: false,
       log: true,
       behindProxy: true,
-      proxyAdmin: ALPHA_RINKEBY_PROXY_ADMIN,
+      proxyAdmin: ALPHA_GOERLI_PROXY_ADMIN,
     },
     badges: {
-      owner: ALPHA_RINKEBY_OWNER,
+      owner: ALPHA_GOERLI_OWNER,
       // Badges Metadata URI for the Badges contract
       uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/goerli/metadata/{id}.json',
     },
     signatureAttester: {
       collectionIdFirst: '0',
       collectionIdLast: '10000000',
-      verifierAddress: ALPHA_RINKEBY_VERIFIER,
+      verifierAddress: ALPHA_GOERLI_VERIFIER,
       migrationContractAddress: ethers.constants.AddressZero,
     },
     skillAttester: {
@@ -194,13 +194,13 @@ export const deploymentsConfig: DeploymentsConfigTypes = {
       uri: 'https://lsccfzddbsxbldlhvfco.supabase.co/storage/v1/object/public/badges/goerli/metadata/{id}.json',
     },
     attestationsRegistry: {
-      owner: ALPHA_RINKEBY_OWNER,
+      owner: ALPHA_GOERLI_OWNER,
     },
     availableRootsRegistry: {
-      owner: ALPHA_RINKEBY_ROOTS_OWNER_RELAYER,
+      owner: ALPHA_GOERLI_ROOTS_OWNER_RELAYER,
     },
     commitmentMapper: {
-      owner: ALPHA_RINKEBY_OWNER,
+      owner: ALPHA_GOERLI_OWNER,
       EdDSAPubKeyX: COMMITMENT_MAPPER_EDDSA_PUB_KEY_STAGING[0],
       EdDSAPubKeyY: COMMITMENT_MAPPER_EDDSA_PUB_KEY_STAGING[1],
     },
