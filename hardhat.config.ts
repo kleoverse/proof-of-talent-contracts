@@ -89,8 +89,8 @@ const config: HardhatUserConfig = {
     outDir: 'types',
   },
   etherscan: {
-    // apiKey: process.env.ETHERSCAN_API_KEY,
-    apiKey: process.env.POLYGONSCAN_API_KEY,
+    apiKey: process.env.ETHERSCAN_API_KEY,
+    // apiKey: process.env.POLYGONSCAN_API_KEY,
   },
   defaultNetwork: 'hardhat',
   networks: {
