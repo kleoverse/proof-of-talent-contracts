@@ -44,7 +44,7 @@ export interface Deployed0 {
   front: Front;
   availableRootsRegistry: AvailableRootsRegistry;
   signatureAttester: SignatureAttester;
-  identityMerkleAttester: IdentityMerkleAttester;
+  identityMerkleAttester?: IdentityMerkleAttester;
   skillAttester: SkillAttester;
   skillBadge: SkillBadge;
 }
@@ -102,10 +102,10 @@ async function deploymentAction(
     options: { ...options, behindProxy: false },
   };
 
-  const { identityMerkleAttester } = (await hre.run(
-    'deploy-identity-merkle-attester',
-    identityMerkleAttesterArgs
-  )) as DeployedIdentityMerkleAttester;
+  //   const { identityMerkleAttester } = (await hre.run(
+  //     'deploy-identity-merkle-attester',
+  //     identityMerkleAttesterArgs
+  //   )) as DeployedIdentityMerkleAttester;
 
   const skillAttesterArgs: DeploySkillAttesterArgs = {
     collectionIdFirst: config.skillAttester.collectionIdFirst,
@@ -135,18 +135,18 @@ async function deploymentAction(
     options: getCommonOptions(options),
   } as AuthorizeRangeArgs);
 
-  if (options.manualConfirm || options.log) {
-    console.log(`
-    ----------------------------------------------------------------
-    * Authorize IdentityMerkleAttester to record on the AttestationsRegistry`);
-  }
-  await hre.run('attestations-registry-authorize-range', {
-    attestationsRegistryAddress: attestationsRegistry.address,
-    attesterAddress: identityMerkleAttester.address,
-    collectionIdFirst: config.identityMerkleAttester.collectionIdFirst,
-    collectionIdLast: config.identityMerkleAttester.collectionIdLast,
-    options: getCommonOptions(options),
-  } as AuthorizeRangeArgs);
+  //   if (options.manualConfirm || options.log) {
+  //     console.log(`
+  //     ----------------------------------------------------------------
+  //     * Authorize IdentityMerkleAttester to record on the AttestationsRegistry`);
+  //   }
+  //   await hre.run('attestations-registry-authorize-range', {
+  //     attestationsRegistryAddress: attestationsRegistry.address,
+  //     attesterAddress: identityMerkleAttester.address,
+  //     collectionIdFirst: config.identityMerkleAttester.collectionIdFirst,
+  //     collectionIdLast: config.identityMerkleAttester.collectionIdLast,
+  //     options: getCommonOptions(options),
+  //   } as AuthorizeRangeArgs);
 
   if (options.manualConfirm || options.log) {
     console.log(`
@@ -230,15 +230,9 @@ async function deploymentAction(
 
     * SignatureAttester:
       -> proxy: ${(await hre.deployments.all()).SignatureAttester.address}
-      -> implem: ${(await hre.deployments.all()).SignatureAttesterImplem.address}
+      -> implem: ${(await hre.deployments.all()).SignatureAttester.address}
       collectionIdFirst: ${config.signatureAttester.collectionIdFirst}
       collectionIdLast: ${config.signatureAttester.collectionIdLast}
-
-    * IdentityMerkleAttester:
-      -> proxy: ${(await hre.deployments.all()).IdentityMerkleAttester.address}
-      -> implem: ${(await hre.deployments.all()).IdentityMerkleAttester.address}
-      collectionIdFirst: ${config.identityMerkleAttester.collectionIdFirst}
-      collectionIdLast: ${config.identityMerkleAttester.collectionIdLast}
 
     * SkillAttester:
       -> proxy: ${(await hre.deployments.all()).SkillAttester.address}
@@ -256,7 +250,7 @@ async function deploymentAction(
 
   return {
     signatureAttester,
-    identityMerkleAttester,
+    // identityMerkleAttester,
     skillAttester,
     availableRootsRegistry,
     front,
