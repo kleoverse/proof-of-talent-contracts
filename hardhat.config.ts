@@ -44,7 +44,7 @@ const FORKING_BLOCK = parseInt(process.env.FORKING_BLOCK || '');
 
 let privateKey;
 const getPrivateKey = (networkName: string) => {
-  if (networkName === 'polygon') {
+  if (networkName === 'polygon-mainnet') {
     return process.env.POLYGON_PRIVATE_KEY;
   } else if (networkName === 'goerli' || networkName === 'mumbai') {
     return process.env.RINKEBY_PRIVATE_KEY;
