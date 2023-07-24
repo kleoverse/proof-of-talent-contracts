@@ -21,12 +21,12 @@ import { network } from 'hardhat';
 dotenv.config();
 
 // Load all tasks files
-if (process.env.SKIP_LOAD !== 'true') {
-  const files = fg.sync(['./tasks/**/*.task.ts'], { dot: true });
-  for (const file of files) {
-    require(file);
-  }
-}
+// if (process.env.SKIP_LOAD !== 'true') {
+//   const files = fg.sync(['./tasks/**/*.task.ts'], { dot: true });
+//   for (const file of files) {
+//     require(file);
+//   }
+// }
 
 const HARDFORK = 'london';
 
@@ -112,7 +112,10 @@ const config: HardhatUserConfig = {
     outDir: 'types',
   },
   etherscan: {
-    apiKey: getExploreKey(network.name)
+    apiKey: {
+      goerli: process.env.ETHERSCAN_API_KEY,
+      polygon: process.env.POLYGONSCAN_API_KEY
+    }
   },
   defaultNetwork: 'hardhat',
   networks: {
