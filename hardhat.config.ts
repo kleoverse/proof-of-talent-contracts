@@ -51,6 +51,14 @@ const getPrivateKey = (networkName: string) => {
   }
 };
 
+const getExploreKey = (networkName: string) => {
+    if (networkName === 'polygon') {
+        return process.env.POLYGONSCAN_API_KEY;
+    } else if (networkName === 'goerli') {
+        return process.env.ETHERSCAN_API_KEY;
+    }
+}
+
 const mainnetFork =
   MAINNET_FORK && FORKING_BLOCK
     ? {
@@ -104,8 +112,7 @@ const config: HardhatUserConfig = {
     outDir: 'types',
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
-    // apiKey: process.env.POLYGONSCAN_API_KEY,
+    apiKey: getExploreKey(network.name)
   },
   defaultNetwork: 'hardhat',
   networks: {
