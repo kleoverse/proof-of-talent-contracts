@@ -1,15 +1,4 @@
 
-<div class="callout-left wide">
-
-🚨 Depreciated! 🚨
-
-</div>
-
-NOTE: This repository is for the v0 protocol contracts. Kindly refer to <a href="https://github.com/kleoverse/proof-of-talent"> current protocol contracts</a>.
-
----
-
-<br />
 <div align="center">
   <img src="docs/kleoverse-logo.png" alt="Logo" width="100" height="100" style="borderRadius: 20px">
 
